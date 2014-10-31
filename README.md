@@ -1,4 +1,4 @@
 mx4-wiki
 ========
 
-Information repository  about MX-4 platform 
+https://github.com/hostmobility/mx4-wiki/wiki
