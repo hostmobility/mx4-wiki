@@ -1779,6 +1779,12 @@ root@mx4-vcc-1000000:~# echo 12000 > /sys/bus/spi/devices/spi3.0/input_voltage_t
 root@mx4-vcc-1000000:~# echo 16000 > /sys/bus/spi/devices/spi3.0/input_voltage_threshold_high_mV
 root@mx4-vcc-1000000:~# echo 12000 > /sys/bus/spi/devices/spi3.0/input_voltage_threshold_low_mV
 ```
+
+```bash
+# Write 0 to both threshold files to disable that specific input as wakeup source
+root@mx4-vcc-1000000:~# echo 0 > /sys/bus/spi/devices/spi3.0/input_voltage_threshold_high_mV
+root@mx4-vcc-1000000:~# echo 0 > /sys/bus/spi/devices/spi3.0/input_voltage_threshold_low_mV
+```
 User has to setup analog wakeup sources prior to calling `go_to_sleep.sh`. See [Enter sleep](#enter-sleep)
 
 ##### Wake on CAN
