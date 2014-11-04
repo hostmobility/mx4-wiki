@@ -859,8 +859,19 @@ The main CPU internal real time clock is `/dev/rtc0` and the time can be read
 out with the `hwclock` command.
 
 ```bash
+# Show hardware date/time
 root@mx4-vcc-1000000:~# hwclock
 Mon Nov  3 13:25:07 2014  0.000000 seconds
+```
+
+```bash
+#Set hardware date/time to system date/time:
+root@mx4-vcc-1000000:~# hwclock -w
+```
+
+```bash
+#Set system date/time to hardware date/time:
+root@mx4-vcc-1000000:~# hwclock -s
 ```
 
 The Linux system time is synchronized with the main CPU internal real time clock at boot time.
