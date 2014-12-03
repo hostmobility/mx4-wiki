@@ -15,6 +15,7 @@
 - [Build Environment](#build-environment)
 - [Bootlog](#bootlog)
 - [Default Login](#default-login)
+- [Reset Cause](#reset-cause)
 - [Timekeeping](#timekeeping)
 	- [Internal RTC](#internal-rtc)
 	- [GPS RTC](#gps-rtc)
@@ -847,6 +848,31 @@ Output from `dmesg` on a MX-4 GTT with a gtt-standalone image
 		mx4-gtt-1000000 login:
 
 Default username: `root` password: `none`
+
+## Reset Cause
+
+One can read out the system reset cause from a spi attribute.
+
+```bash
+root@ultra14211046:~# cat /sys/bus/spi/devices/spi3.0/ctrl_pic_reset_cause
+1
+```
+
+```c
+#define REG_BIT(bit)                    (1 << (bit))
+
+#define PRC_POWER_ON_RESET              REG_BIT(0)
+#define PRC_BROWN_OUT_RESET             REG_BIT(1)
+#define PRC_IDLE                        REG_BIT(2)
+#define PRC_SLEEP                       REG_BIT(3)
+#define PRC_WDTO                        REG_BIT(4)
+#define PRC_SWR                         REG_BIT(5)
+#define PRC_MCLR                        REG_BIT(6)
+#define PRC_CONFIG_MISMATCH             REG_BIT(7)
+#define PRC_DEEP_SLEEP                  REG_BIT(8)
+#define PRC_ILLEGAL_OPCODE_RESET        REG_BIT(9)
+#define PRC_TRAP_CONFLICT_RESET         REG_BIT(10)
+```
 
 ## Timekeeping
 
