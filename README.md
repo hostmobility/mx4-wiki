@@ -30,7 +30,6 @@
 			- [Analog Inputs](#wake-on-analog-inputs)
 			- [CAN](#wake-on-can)
 	- [Shutdown/Cutoff](#shutdown)
-- [Package Manager](#package-manager)
 - [Communication Interfaces](#communication-interfaces)
 	- [Serial Devices](#serial-devices)
 	- [CAN](#can)
@@ -65,6 +64,7 @@
 		- [STANDBY-STATE](#standby-state)
 		- [ERROR-STATE](#error-state)
 		- [FIRMWARE-UPGRADE](#firmware-upgrade)
+- [Package Manager](#package-manager)
 
 ## Overview
 
