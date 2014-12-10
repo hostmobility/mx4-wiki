@@ -83,7 +83,7 @@ All hardware interfaces are accessible via well defined API's. We try to reuse t
 Main software components:
 
 - Tool-chain
-	- Tegra2: Linaro GCC 4.7-2013.09 (http://releases.linaro.org/13.09/components/toolchain/gcc-linaro/4.7)
+	- [Tegra2: Linaro GCC 4.7-2013.09] (https://releases.linaro.org/13.06/components/toolchain/binaries/gcc-linaro-arm-linux-gnueabihf-4.8-2013.06_linux.tar.xz)
 - Linux (Tegra2: 3.1.10)
 - U-boot (Tegra2: 2011.06)
 - Ångstrom distribution built with yocto (dylan branch)(https://www.yoctoproject.org/)
