@@ -128,7 +128,12 @@ Work in progress..
 
 List of supported distros can be found at http://www.yoctoproject.org/docs/1.4.1/ref-manual/ref-manual.html#detailed-supported-distros
 
-Also install the required host packages according to above manual.
+Following packages need to be installed. Below example is Ubuntu 14.10
+```
+sudo apt-get install subversion git u-boot-tools cbootimage curl gawk wget \
+git-core diffstat unzip texinfo build-essential chrpath autoconf flex bison \
+device-tree-compiler mtd-utils
+```
 
 ## Bootlog
 
