@@ -132,7 +132,7 @@ Following packages need to be installed. Below example is Ubuntu 14.10
 ```
 sudo apt-get install subversion git u-boot-tools cbootimage curl gawk wget \
 git-core diffstat unzip texinfo build-essential chrpath autoconf flex bison \
-device-tree-compiler mtd-utils
+device-tree-compiler mtd-utils lzop
 ```
 
 ## Bootlog
