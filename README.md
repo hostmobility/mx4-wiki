@@ -93,7 +93,7 @@ Main software components:
 
 Host Mobility AB provides a simple method to update the firmware in the MX-4 hardware.
 
-This method is based on a root filesystem image (named "hmupdate.img") which is able to update all software components (Linux kernel, u-boot, distribution, co-processor firmware).
+This method is based on a u-boot script (named "hmupdate.img") which is able to update all software components (Linux kernel, u-boot, distribution, co-processor firmware).
 
 This is easily done by placing "hmupdate.img" in the root of a USB flash drive and simply restarting the MX-4 system with the USB flash drive plugged in.
 
