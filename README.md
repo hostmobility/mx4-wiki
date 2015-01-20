@@ -76,7 +76,7 @@ When you buy a MX-4 hardware from Host Mobility AB the following is included.
 
 #### Platform
 
-Host Mobility AB provides a complete Linux platform with driver support for all hardware interfaces and with an customizable distribution.
+Host Mobility AB provides a complete Linux platform with driver support for all hardware interfaces and with a customizable distribution.
 
 All hardware interfaces are accessible via well defined API's. We try to reuse the standard Linux way of doing things as much as we can. This way the platform environment is familiar to developers who has worked with embedded Linux in their past.
 
@@ -93,11 +93,11 @@ Main software components:
 
 Host Mobility AB provides a simple method to update the firmware in the MX-4 hardware.
 
-This method is based on a hmupdate.img which is able to update all software components (Linux kernel, u-boot, distribution, co-processor firmware).
+This method is based on a root filesystem image (named "hmupdate.img") which is able to update all software components (Linux kernel, u-boot, distribution, co-processor firmware).
 
-This is easily done by placing an hmupdate.img in the root of a USB flash drive and simply restarting the MX-4 system with the USB flash drive plugged in.
+This is easily done by placing "hmupdate.img" in the root of a USB flash drive and simply restarting the MX-4 system with the USB flash drive plugged in.
 
-The hmupdate.img can also be placed in the internal nand flash in /boot directory which will trigger an update as well. This method could be integrated in a customer application for over the air updates.
+The image ("hmupdate.img") can also be placed in the internal nand flash in /boot directory which will trigger an update as well. This method could be integrated in a customer application for over the air updates.
 
 #### Source code
 
@@ -949,7 +949,7 @@ All MX-4 boards are equipped with CAN controllers. We are using the socketCAN AP
 
 #### Configuring CAN bus
 
-Setting CAN speed to 250 kbit/s and listen only mode. `iproute2` is an requirement for these commands to work.
+Setting CAN speed to 250 kbit/s and listen only mode. `iproute2` is a requirement for these commands to work.
 ```bash
 ip link set can0 type can bitrate 250000 listen-only on
 ifconfig can0 up
@@ -1102,7 +1102,7 @@ $IPT -P OUTPUT ACCEPT
 
 ## Modem
 
-The MX-4 board is equipped with an 3G modem. It is not started by default when the unit is powered one but has to be explicitly turned on with the following command:
+The MX-4 board is equipped with a 3G modem. It is not started by default when the unit is powered one but has to be explicitly turned on with the following command:
 
      root@mx4-gtt:~# echo 1 > /sys/bus/spi/devices/spi3.0/ctrl_modem_on
 
@@ -1135,7 +1135,7 @@ The modem can also be turned off with this command.
 root@mx4-gtt:~# echo 0 > /sys/bus/spi/devices/spi3.0/ctrl_modem_on
 ```
 
-### Creating an PPP connection
+### Creating a PPP connection
 First off we need to install `pppd` if it does not exist on target.
 
 ```bash
@@ -1382,7 +1382,7 @@ Dec 20 10:35:43 mx4-gtt daemon.debug pppd[564]: Script /etc/ppp/ip-up finished (
 ), status = 0x1
 ```
 
-You can now also see with `ifconfig` that you got an ppp connection
+You can now also see with `ifconfig` that you got a ppp connection
 
 ```bash
 root@mx4-gtt:~# ifconfig ppp0
@@ -1396,7 +1396,7 @@ ppp0      Link encap:Point-to-Point Protocol
 ```
 
 ### GPS
-The GPS chip is integrated in the modem module. Default it is turned off. To turn on the GPS chip send following AT command to the application port. This is not an persistent setting so one has to enable GPS each time modem restarts if GPS data is desired.
+The GPS chip is integrated in the modem module. Default it is turned off. To turn on the GPS chip send following AT command to the application port. This is not a persistent setting so one has to enable GPS each time modem restarts if GPS data is desired.
 
 ```bash
 root@mx4-gtt:~# printf 'at^sgpsc="Engine","1"\r' > /dev/ttyUSB2
@@ -1418,7 +1418,7 @@ $GPGSA,A,1,,,,,,,,,,,,,,,*1E
 
 ### Watchdog
 
-The co-processor acts as an watchdog of the modem. It monitors the power indicator signal by default. If it should detect that the modem is for some reason turned off even though it should be on it will attempt to restart it at first via a soft reset signal and after a few attempts it will do an hard-reset of modem.
+The co-processor acts as a watchdog of the modem. It monitors the power indicator signal by default. If it should detect that the modem is for some reason turned off even though it should be on it will attempt to restart it at first via a soft reset signal and after a few attempts it will do a hard-reset of modem.
 
 To enable monitoring of SLED signal which is an output from modem which reports current status one has to enable this signal. This signal should always toggle on/off, depending on state it toggles in different frequency. Should the co-cpu detect that it stops toggling which is an ERROR state it will attempt to soft restart modem first and if that fails a hard-reset.
 
@@ -1467,7 +1467,7 @@ GPIOs 238-255, mx4_digitals:
  gpio-250 (mx4 - sc digital out) out lo
 ```
 
-`sc digital out` are inputs indicating short for each output. If an short is detected it goes HIGH (1).
+`sc digital out` are inputs indicating short for each output. If a short is detected it goes HIGH (1).
 
 #### Read gpio value
 
@@ -1645,9 +1645,9 @@ In [frequency](#wiki-frequency) the wanted time for the oneshot is configured.
 - All LEDS(not wifi) Flashing green/off 5 Hz: The unit is in an error state. Failing to boot operating system. This is the default state when the unit is powered on.
 
 #### FIRMWARE UPGRADE
-An firmware upgrade can be followed by monitoring the LED behavior.
+A firmware upgrade can be followed by monitoring the LED behavior.
 
-1. All LEDS(not wifi) Flashing green/off 1 Hz: The unit is loading/running an hmupdate.img from USB driver or /boot. DO NOT REMOVE POWER!
+1. All LEDS(not wifi) Flashing green/off 1 Hz: The unit is loading/running an image ("hmupdate.img") from USB driver or /boot. DO NOT REMOVE POWER!
 1. When hmupdate.img is finished the system will start up. This will be indicated by PWR LED Flashing green/off 1 Hz.
 1. First boot after hmupdate.img is run we also update co-processor firmware. This is indicated by following sequence:
 - FUNC LED Solid green and other LED's off. Entered co-processor bootloader and will load an application to update co processor bootloader.
@@ -1759,7 +1759,7 @@ List of periphials that will lose power and that need to be re-initalized after 
 
 #### Enter sleep
 
-Host Mobility provides an script to easy enter sleep/suspend mode. The script is `/opt/hm/go_to_sleep.sh`.
+Host Mobility provides a script to easy enter sleep/suspend mode. The script is `/opt/hm/go_to_sleep.sh`.
 
 ```bash
 Usage: go_to_sleep.sh options (:thdc)
@@ -1836,7 +1836,7 @@ Wake on CAN is not supported by all MX-4 platforms. Contact Host Mobility suppor
 Wake on CAN is enabled by passing `-c` to `go_to_sleep.sh`. See [Enter sleep](#enter-sleep). But prior to doing this one has
 to enable which specific CAN buses should be enabled as wakeup source.
 
-By default all CAN buses will trigger an wakeup if there is traffic on them and `-c` is passed to `go_to_sleep.sh`
+By default all CAN buses will trigger a wakeup if there is traffic on them and `-c` is passed to `go_to_sleep.sh`
 
 GPIO's are used to set this up.
 
