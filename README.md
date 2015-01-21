@@ -7,6 +7,7 @@
 - [Overview](#overview)
 	- [Soft deliverables](#soft-deliverables)
 		- [Platform](#platform)
+			- [Release structure](#release-structure)
 			- [Firmware update](#firmware-update)
 		- [Source code](#source-code)
 		- [Support](#support)
@@ -89,6 +90,14 @@ Main software components:
 - Ångstrom distribution built with yocto (dylan branch)(https://www.yoctoproject.org/)
 - Co-processor firmware
 
+##### Release structure
+
+When master branch is considered to be stable with a certain amount of new functionality there will be a new BSP release.
+
+First the mx4-bsp-vx.x.x tag is created in mx4 and in all sub repositories. The tag is converted to a branch in which one can push bug fixes. Each BSP release will get a Jenkins job defined.
+
+The above structure is needed since we have alot of products in the same tree and we most likely will break something when adding new products to the tree. This way we have always our stable branches while developing new functionality.
+
 ##### Firmware Update
 
 Host Mobility AB provides a simple method to update the firmware in the MX-4 hardware.
@@ -98,6 +107,20 @@ This method is based on a u-boot script (named "hmupdate.img") which is able to 
 This is easily done by placing "hmupdate.img" in the root of a USB flash drive and simply restarting the MX-4 system with the USB flash drive plugged in.
 
 The image ("hmupdate.img") can also be placed in the internal nand flash in /boot directory which will trigger an update as well. This method could be integrated in a customer application for over the air updates.
+
+**After BSP release 1.1.x the user needs to trigger a probe for an update image (hmupdate.img), this was done on every startup on earlier releases.**
+
+**To update from USB you need to plug in the USB containing an image ("hmupdate.img") and press the reset button.**
+
+**To trigger an update from /boot one needs to set the `firmware_update` u-boot environment variable to `true`. See below example on how to do that.**
+
+**Setting `firmware_update` to `true` will enable USB update as well if an image is present on the USB drive.**
+***
+
+```
+# Set u-boot environment variable
+root@mx4_vf-1000000:/opt/hm/fw_env# ./fw_setenv firmware_update true
+```
 
 #### Source code
 
