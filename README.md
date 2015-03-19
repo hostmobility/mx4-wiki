@@ -1179,80 +1179,82 @@ opkg update
 opkg install ppp
 ```
 
-There is two files that we need to modify/create. `/etc/ppp/options` and `/etc/ppp/pppd_connect-chat`.
+File structure needed for ppp to work:
+```
+/etc/ppp
+├── chap-secrets
+├── ip-down.d
+│   └── # Custom down script
+├── ip-up.d
+│   ├── # Custom up script
+├── operators
+│   └── apn
+├── pap-secrets
+├── peers
+│   └── provider
+├── pppd_connect-chat
+└── pppd_disconnect-chat
+```
 
+Contest of above files:
+/etc/ppp/operators/apn
+```
+AT+CGDCONT=1,"IP","openroamer.com","",0,0
+```
+Replace "openroamer.com" with your operator APN
 
-/etc/ppp/options
-
-```bash
+/etc/ppp/peers/provider
+```
 # File: /etc/ppp/options
-
 # We set defualt remote ip adress.
 #:192.168.255.1
-
 #Some GPRS phones don't reply to LCP echo's
 lcp-echo-failure 0
 lcp-echo-interval 0
-
 # Keep pppd attached to the terminal:
 # Comment this to get daemon mode pppd
 #nodetach
-
 # Debug info from pppd:
 # Comment this off, if you don't need more info
 debug
-
 persist
 holdoff 5
 maxfail 0
-
 # Show password in debug messages
 show-password
-
 # Connect script:
 # scripts to initialize the GPRS modem and start the connection,
 #connect /etc/pppd_connect-chat
 connect '/usr/sbin/chat -v -f /etc/ppp/pppd_connect-chat'
-
 # Disconnect script:
 # AT commands used to 'hangup' the GPRS connection.
 #disconnect /etc/pppd_disconnect-chat
-disconnect '/usr/sbin/chat -v -f /etc/pppd_disconnect-chat'
-
+disconnect '/usr/sbin/chat -v -f /etc/ppp/pppd_disconnect-chat'
 # Serial device to which the GPRS phone is connected:
 /dev/ttyUSB3
-
 # Serial port line speed
 115200 # fast enough
-
 # Hardware flow control:
 # Use hardware flow control with cable, Bluetooth and USB but not with IrDA.
 crtscts # serial cable, Bluetooth and USB, on some occations with IrDA too
-
 # Ignore carrier detect signal from the modem:
 local
-
 # IP addresses:
 # - accept peers idea of our local address and set address peer as 10.0.0.1
 # (any address would do, since IPCP gives 0.0.0.0 to it)
 # - if you use the 10. network at home or something and pppd rejects it,
 # change the address to something else
 #0.0.0.0:0.0.0.0
-
 # pppd must not propose any IP address to the peer!
 noipdefault
-
 # Accept peers idea of our local address
 ipcp-accept-local
 ipcp-accept-remote
-
 # Add the ppp interface as default route to the IP routing table
 defaultroute
-
 # DNS servers from the phone:
 # some phones support this, some don't.
 usepeerdns
-
 # ppp compression:
 # ppp compression may be used between the phone and the pppd, but the
 # serial connection is usually not the bottleneck in GPRS, so the
@@ -1278,43 +1280,63 @@ noauth
 mru 1500
 mtu 1400
 ```
-
-/etc/ppd/pppd_connect-chat
-```bash
+/etc/ppp/pppd_connect-chat
+```
 #!/bin/sh
 #
 # File: /etc/ppp/pppd_connect-chat
-TIMEOUT 5
-ECHO ON
-ABORT '\nBUSY\r'
-ABORT '\nERROR\r'
-ABORT '\nNO ANSWER\r'
-ABORT '\nNO CARRIER\r'
-ABORT '\nNO DIALTONE\r'
-ABORT '\nRINGING\r\n\r\nRINGING\r'
-'' \rATZ
-TIMEOUT 12
-SAY "Press CTRL-C to close the connection at any stage!"
-SAY "\ndefining PDP context...\n"
-OK ATH
-OK ATE1
-OK-AT-OK AT+CGDCONT=1,"IP","internet.cxn","",0,0
-OK ATD*99#
-TIMEOUT 22
-SAY "\nwaiting for connect...\n"
-CONNECT ""
-SAY "\nConnected."
-SAY "\nIf the following ppp negotiations fail,\n"
-SAY "try restarting the phone.\n"
+ TIMEOUT 5
+ ECHO ON
+ ABORT '\nBUSY\r'
+ ABORT '\nERROR\r'
+ ABORT '\nNO ANSWER\r'
+ ABORT '\nNO CARRIER\r'
+ ABORT '\nNO DIALTONE\r'
+ ABORT '\nRINGING\r\n\r\nRINGING\r'
+ '' \rATZ
+ TIMEOUT 12
+ SAY "Press CTRL-C to close the connection at any stage!"
+ SAY "\ndefining PDP context...\n"
+ OK ATH
+ OK ATE1
+ OK-AT-OK @/etc/ppp/operators/apn
+ OK ATD*99#
+ TIMEOUT 22
+ SAY "\nwaiting for connect...\n"
+ CONNECT ""
+ SAY "\nConnected."
+ SAY "\nIf the following ppp negotiations fail,\n"
+ SAY "try restarting the phone.\n"
 ```
-Once these two files are properly setup we are ready to start the deamon. One tip is to start up syslogd and run `tail -f /var/log/messages &`, this way you will get some output during the connection process and makes it easier to debug in case of connection errors.
+
+/etc/ppp/pppd_disconnect-chat
+```bash
+at
+ABORT "BUSY"
+ABORT "ERROR"
+ABORT "NO DIALTONE"
+SAY "n\Sending break to the modem\n"
+"" "\K"
+"" "\K"
+"" "\K"
+"" "+++ATH"
+"" "+++ATH"
+"" "+++ATH"
+SAY "\nModem context detached\n"
+```
+
+`/etc/ppp/pap-secrets` and `/etc/ppp/chap-secrets` are empty and do not really need to exist unless you need to use one of these methods to auth with network provider.
+
+When you have the above structure correctly setup you can then start and stop pppd connections with `pon` and `poff` commands.
+
+One tip is to start up syslogd and run `tail -f /var/log/messages &`, this way you will get some output during the connection process and makes it easier to debug in case of connection errors.
 
 Here is an example.
 
 ```bash
 root@mx4-gtt:~# syslogd
 root@mx4-gtt:~# tail -f /var/log/messages &
-root@mx4-gtt:/etc/ppp/operators# pppd
+root@mx4-gtt:/etc/ppp/operators# pon
 root@mx4-gtt:/etc/ppp/operators# Dec 20 10:35:27 mx4-gtt daemon.notice pppd[564]: pppd
 2.4.5 started by root, uid 0
 Dec 20 10:35:27 mx4-gtt local2.info chat[565]: timeout set to 5 seconds
