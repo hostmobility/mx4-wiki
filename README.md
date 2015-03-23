@@ -1498,9 +1498,9 @@ with baudrate 115200. The LIN interface is controled via a set of predefined<br>
 frames, mostly used to alter the LIN schedule table.<br>
 <br>
 All frames sent to PIC is on the format:<br>
-<br>
+```
 start of transmission | message length | message type | data | checksum<br>
-<br>
+```
 start of transmission (4 bytes):<br>
 This is a byte sequence used to indicate the start of a frame. <br>
 It consists of the 4 byte long sequence: 0x7e 0x7e 0x7e 0xa7<br>
@@ -1620,6 +1620,126 @@ A simple XOR checksum of all bytes in message including message length.<br>
 <br>
     master - 1<br>
     listen - 0<br>
+### Sample application for sending frames and receiving responses on Linux
+```C
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <termios.h>
+
+/* The application reads from arguments which kind of operation to perform and
+ * all data associated with that operation. */
+
+int main(int argc, char *argv[]) {
+    int fd;
+    int res;
+    int fflags;
+    char i;
+    char msg_len;
+    char listen;
+    struct termios tio;
+    char buff[255];
+
+    fd = open("/dev/ttyHS2", O_RDWR | O_NOCTTY);
+    if (fd < 0) {
+        fprintf(stderr, "Error open tty\n");
+        return -1;
+    }
+
+    tio.c_cflag = B115200 | CRTSCTS | CS8 | CLOCAL | CREAD;
+    tio.c_iflag = IGNPAR;
+    tio.c_oflag = 0;
+    tio.c_lflag = 0;
+    tio.c_cc[VTIME] = 0;
+    
+    tcflush(fd, TCIFLUSH);
+    tcsetattr(fd, TCSANOW, &tio);
+
+    buff[0] = 0x7E;
+    buff[1] = 0x7E;
+    buff[2] = 0x7E;
+    buff[3] = 0xA7;
+
+    listen = !strcmp(argv[1], "listen");
+
+    if (!listen) {
+        if (!strcmp(argv[1], "schedule")) {
+            buff[5] = 2;
+        }
+        if (!strcmp(argv[1], "frame")) {
+            buff[5] = 3;
+        }
+        if (!strcmp(argv[1], "item")) {
+            buff[5] = 4;
+        }
+        if (!strcmp(argv[1], "baudrate")) {
+            buff[5] = 5;
+        }
+        if (!strcmp(argv[1], "master")) {
+            buff[5] = 6;
+        }
+
+        if (!buff[5]) {
+            fprintf(stderr, "No valid command.\n");
+            return 1;
+        } 
+
+        for (i = 2; i < argc; i++) {
+            sscanf(argv[i], "%d", &buff[4 + i]);
+        }
+
+        /* Checksum */
+        msg_len = argc; /* Length of message is length of data + 1 for checksum */
+        buff[4] = msg_len;
+        for (i = 0; i < buff[4]; i++) {
+            buff[4 + msg_len] ^= buff[4 + i];
+        }
+
+        write(fd, buff, 4 + 1 + msg_len); /* Bytes to send are: start of message bytes + length + (type, data, chksum) */
+
+        sleep(1);
+    }
+
+    do {
+        fflags = fcntl(fd, F_GETFL, 0);
+        if (fflags < 0) {
+            fprintf(stderr, "Could not get fd flags\n");
+            return -1;
+        }
+        fcntl(fd, F_SETFL, fflags | O_NONBLOCK);
+
+        res = read(fd, buff, 255);
+        if (res > 0) {
+            for (i = 0; i < res; i++) {
+                printf("%x, ", buff[i]);
+            }
+            printf("\n");
+        }
+        usleep(10000);
+    } while (listen);
+
+    return 0;
+}
+```
+#### Example of usage of application
+```bash
+# Setup frame 10 to send data to slaves using protocol 1 with 3 data bytes (1,
+# 2, 3)
+./lin_send frame 10 0 0 3 1 2 3
+# Setup frame 16 to request a response from slaves using protocol 1 and expect
+# 4 bytes long answer.
+./lin_send frame 16 3 0 4
+# Schedule created frames in slot 0 and 1, both using 60 ticks each and enable
+# both.
+./lin_send item 0 10 60 1
+./lin_send item 1 16 60 1
+# Enable the schedule to use items 0-1 start with item 0.
+./lin_send schedule 0 1 0 1
+# Start to listen for forwarded responses.
+./lin_send listen
+```
 
 ## Digital and Analog
 
