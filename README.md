@@ -1514,11 +1514,11 @@ Which type of operation that is requested.<br>
 Values start at 1 and is sequentually increased.<br>
 1. Received response. Message contains data received from LIN slave unit. Direction from PIC to<br>
 Linux.<br>
-2. Set schedule. Setup the LIN schedule.<br>
-3. Set frame. Setup a LIN frame.<br>
-4. Set item. Setup a LIN schedule item.<br>
-5. Set baudrate. Setup LIN baudrate.<br>
-6. Set master. Setup master/listen mode.<br>
+2. [Set schedule](#wiki-set-schedule). Setup the LIN schedule.<br>
+3. [Set frame](#wiki-set-frame). Setup a LIN frame.<br>
+4. [Set item](#wiki-set-item). Setup a LIN schedule item.<br>
+5. [Set baudrate](#wiki-set-baudrate). Setup LIN baudrate.<br>
+6. [Set master](#wiki-set-master). Setup master/listen mode.<br>
 <br>
 Defined in lin.h as:<br>
 ```c
