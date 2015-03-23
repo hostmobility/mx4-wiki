@@ -1492,7 +1492,134 @@ Work in progress...
 
 ## LIN
 
-Work in progress...
+How to control LIN via serial interface:<br>
+The LIN interface in the PIC is accessed via the serial console /dev/ttyHS2<br>
+with baudrate 115200. The LIN interface is controled via a set of predefined<br>
+frames, mostly used to alter the LIN schedule table.<br>
+<br>
+All frames sent to PIC is on the format:<br>
+<br>
+start of transmission | message length | message type | data | checksum<br>
+<br>
+start of transmission (4 bytes):<br>
+This is a byte sequence used to indicate the start of a frame. <br>
+It consists of the 4 byte long sequence: 0x7e 0x7e 0x7e 0xa7<br>
+<br>
+message length (1 byte):<br>
+The length of message type (1 byte) + data (variable) + checksum (1 byte)<br>
+The byte for message length is not included in message length.<br>
+<br>
+message type (1 byte): <br>
+Which type of operation that is requested.<br>
+Values start at 1 and is sequentually increased.<br>
+1. Received response. Message contains data received from LIN slave unit. Direction from PIC to<br>
+Linux.<br>
+2. Set schedule. Setup the LIN schedule.<br>
+3. Set frame. Setup a LIN frame.<br>
+4. Set item. Setup a LIN schedule item.<br>
+5. Set baudrate. Setup LIN baudrate.<br>
+6. Set master. Setup master/listen mode.<br>
+<br>
+Defined in lin.h as:<br>
+```c
+#define MSG_RECV_RESPONSE 1<br>
+#define MSG_SET_SCHEDULE 2<br>
+#define MSG_SET_FRAME 3<br>
+#define MSG_SET_ITEM 4<br>
+#define MSG_SET_BAUDRATE 5<br>
+#define MSG_SET_MASTER 6<br>
+```
+<br>
+data (variable):<br>
+Bytes of data that each message type may contain.<br>
+<br>
+checksum:<br>
+A simple XOR checksum of all bytes in message including message length.<br>
+<br>
+Message types:<br>
+Received response. <br>
+    If a frame that requests a response from a slave unit is configured to<br>
+    forward the response the response is forwarded from PIC to Linux in a<br>
+    frame formatted:<br>
+    message start | length of message | message type 1 | data (revc status 1<br>
+    byte, frame id 1 byte, response length 1 byte, response data) | checksum<br>
+<br>
+Set schudle.<br>
+    This frame sets the start, end and current item to handle and<br>
+    enables/disables the schedule. Start, end and current can be any value<br>
+    0-255. Start cannot be past end. Current must be inside start and end.<br>
+    Enabled i any value > 0.<br>
+    Format:<br>
+    message start | length of message | message type 2 | data (start slot 1<br>
+    byte, end slot 1 byte, current slot 1 byte, enabled 1 byte) | checksum<br>
+<br>
+Set frame.<br>
+    This frame type is used to setup a specific LIN frame.<br>
+    Format:<br>
+    message start | length of message | message type 3 | data (LIN id 1 byte,<br>
+    frame options 1 byte, frame flags 1 byte, data length 1 byte, data<br>
+    0-LIN_MAX_DATABYTES) | checksum<br>
+<br>
+    LIN id can be any valid LIN id. 0-64.<br>
+    frame options: <br>
+        Specifies if frame is send/receive. Bit 0 - unset specifies frame is<br>
+        send fram. Bit 1 - if response shall be forwardet. Bit 3 - if frame is<br>
+        oneshot.<br>
+<br>
+    frame flags:<br>
+        Specifies the version of LIN protocoll to be used. Bit 0 - unset<br>
+        specifies that protocoll 1 is used for this frame.<br>
+<br>
+    data length:<br>
+        Length of data to be sent or received. For receive frames expected<br>
+        data length must be set.<br>
+<br>
+Set item.<br>
+    This frame type is used to setup an item in the schedule. <br>
+    It specifies a position in the schedule were a given LIN id shall be<br>
+    handled. Multiple items with the same id can exist. How many LIN ticks<br>
+    the item shall use and if the item is enabled.<br>
+    Format:<br>
+    message start | length of message | message type 4 | data (frame number 1<br>
+    byte, LIN id 1 byte, LIN ticks 1 byte, enabled 1 byte) | checksum<br>
+<br>
+    frame number:<br>
+        Which slot in the scheudle. Value 0 - LIN_SCHEDULE_TABLE_ENRIES (256)<br>
+<br>
+    LIN id: <br>
+        Any valid LIN id.<br>
+    <br>
+    LIN ticks:<br>
+        How long time the item occupies. One tick is 10ms long.<br>
+<br>
+    Enable:<br>
+        Any value >0 to enable.<br>
+<br>
+Set baudrate.<br>
+    The defualt baudrate of this LIN implementation is 9600 bauds. The LIN<br>
+    specification states that baudrates 2400, 9600 and 19200 is supported.<br>
+    These rates are supported and rates 4800 and 10400 can also be set.<br>
+    Format:<br>
+    message start | length of message | message type 5 | data (baudrate<br>
+    enumerator 1 byte) | checksum<br>
+<br>
+    baudrate enumeration:<br>
+        2400 - 1<br>
+        4800 - 2<br>
+        9600 - 3<br>
+        10400 - 4<br>
+        19200 - 5<br>
+<br>
+Set master.<br>
+    Configures LIN bus for either acting as master or just listening for LIN<br>
+    data on the bus. LIN bus is default configured as master.<br>
+    When configured as listener all valid messages will be forwarded. <br>
+    Format:<br>
+    message start | length of message | message type 6 | data (master/listen 1<br>
+    byte) | checksum<br>
+<br>
+    master - 1<br>
+    listen - 0<br>
 
 ## Digital and Analog
 
