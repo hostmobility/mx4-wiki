@@ -1554,25 +1554,25 @@ A simple XOR checksum of all bytes in message including message length.<br>
     byte, end slot 1 byte, current slot 1 byte, enabled 1 byte) | checksum<br>
 <br>
 ##### Set frame
-    This frame type is used to setup a specific LIN frame.<br>
-    Format:<br>
-    message start | length of message | message type 3 | data (LIN id 1 byte,<br>
-    frame options 1 byte, frame flags 1 byte, data length 1 byte, data<br>
-    0-LIN_MAX_DATABYTES) | checksum<br>
-<br>
-    LIN id can be any valid LIN id. 0-64.<br>
-    frame options: <br>
-        Specifies if frame is send/receive. Bit 0 - unset specifies frame is<br>
-        send fram. Bit 1 - if response shall be forwardet. Bit 3 - if frame is<br>
-        oneshot.<br>
-<br>
-    frame flags:<br>
+    This frame type is used to setup a specific LIN frame.
+    Format:
+    message start | length of message | message type 3 | data (LIN id 1 byte,
+    frame options 1 byte, frame flags 1 byte, data length 1 byte, data
+    0-LIN_MAX_DATABYTES) | checksum
+
+    LIN id can be any valid LIN id. 0-64.
+    frame options: 
+        Specifies if frame is send/receive. Bit 0 - unset specifies frame is
+        send fram. Bit 1 - if response shall be forwardet. Bit 3 - if frame is
+        oneshot.
+
+    frame flags:
         Specifies the version of LIN protocoll to be used. Bit 0 - unset<br>
         specifies that protocoll 1 is used for this frame.<br>
-<br>
-    data length:<br>
-        Length of data to be sent or received. For receive frames expected<br>
-        data length must be set.<br>
+
+    data length:
+        Length of data to be sent or received. For receive frames expected
+        data length must be set.
 <br>
 ##### Set item
     This frame type is used to setup an item in the schedule. <br>
