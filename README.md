@@ -61,6 +61,7 @@
 	- [Flash config](#flash-config)
 	- [Current LED](#current-led)
 	- [Oneshot](#oneshot)
+    - [Configuration examples](#example-of-configuration)
 	- [Pre configured LED behavior](#pre-configured-led-behavior)
 		- [PWR](#pwr)
 		- [STANDBY-STATE](#standby-state)
@@ -1666,6 +1667,12 @@ LED flashing is configured by sending 4 bytes on corresponding led_-file in Linu
 Frequency is configured according to:<br>
 0 - Flashing off <br>
 1-255 - Flashing with frequency; _value * 100 milliseconds_<br>
+<br>
+If only no alternative frequency is configured the time for each state will be the same. If different times are wanted also use alternative frequency.<br>
+
+### Alternative frequency
+0 - No alternative frequency. <br>
+1-255 - Flashing with frequency; _value * 100 milliseconds_<br>
 
 ### Flash config
 A bitmask configures which states that shall be included in the flashing sequence.<br>
@@ -1682,6 +1689,54 @@ This value can also be used to configure [oneshot](#wiki-oneshot) flashing.
 Oneshot flashing is configured by only configuring the wanted finishing state in the [flash config](#wiki-flash-config).
 In [current LED](#wiki-current-led) the wanted starting state is configured.
 In [frequency](#wiki-frequency) the wanted time for the oneshot is configured.
+
+### Example of configuration
+#### Flashing between state 1 and off, 1 second intervall.
+Byte 3, frequency byte: 1s / 100ms = 10. <br>
+Byte 2, not used: 0. <br>
+Byte 1, bit 0 and bit 1 used: (1 << 1) | (1 << 0) = 3.<br>
+<table>
+    <tr>
+        <td>Byte 3</td>
+        <td>Byte 2</td>
+        <td>Byte 1</td>
+        <td>Byte 0</td>
+    </tr>
+    <tr>
+       <td>10</td>
+       <td>0</td>
+       <td>3</td>
+       <td>0</td>
+   <tr>
+</table>
+Puting it together: <br>
+10 << (8 * 3) | ((1 << 1) | (1 << 0)) | (8 * 1) = 167772171 <br>
+In this case the flashing will start at state 0, if we want it to start at state 1 we have to set this in byte 0.<br>
+In byte 0 numerical representations of the stat is used so just add 1 to previous value.<br>
+#### Flashing between state 1 and 2, state 1 lit for 2 seconds and state 2 lit for 500 milliseconds.
+Byte 3, frequency byte: 500ms / 100ms = 5. <br>
+Byte 2, frequency byte: 2s / 100ms = 20. <br>
+Byte 1, bit 1 and bit 2 used: (1 << 2) | (1 << 1) = 6.<br>
+Byte 0, initial state. State configured as initial state will get the time configured in byte 3. So set to 2 in this case.
+<table>
+    <tr>
+        <td>Byte 3</td>
+        <td>Byte 2</td>
+        <td>Byte 1</td>
+        <td>Byte 0</td>
+    </tr>
+    <tr>
+       <td>5</td>
+       <td>20</td>
+       <td>6</td>
+       <td>2</td>
+   <tr>
+</table>
+5 << (8*3) | 20 << (8*2) | 6 << 8 | 2 = 85198338 <br>
+#### One-shot flash
+To configure one-shot flash an initial state and a finishing state is configured with the time for the initial state configured in byte 3.
+Initial state is configured in byte 0 and finishing state is configured in byte 1. This means that in byte 1 we can just put one state and that state will be kept until a new value is sent to the led.
+
 
 ### Pre configured LED behavior
 
