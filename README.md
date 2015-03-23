@@ -1538,21 +1538,21 @@ A simple XOR checksum of all bytes in message including message length.<br>
 <br>
 #### Message types
 ##### Received response
-    If a frame that requests a response from a slave unit is configured to<br>
-    forward the response the response is forwarded from PIC to Linux in a<br>
-    frame formatted:<br>
-    message start | length of message | message type 1 | data (revc status 1<br>
-    byte, frame id 1 byte, response length 1 byte, response data) | checksum<br>
-<br>
+    If a frame that requests a response from a slave unit is configured to
+    forward the response the response is forwarded from PIC to Linux in a
+    frame formatted:
+    message start | length of message | message type 1 | data (revc status 1
+    byte, frame id 1 byte, response length 1 byte, response data) | checksum
+
 ##### Set schedule
-    This frame sets the start, end and current item to handle and<br>
-    enables/disables the schedule. Start, end and current can be any value<br>
-    0-255. Start cannot be past end. Current must be inside start and end.<br>
-    Enabled i any value > 0.<br>
-    Format:<br>
-    message start | length of message | message type 2 | data (start slot 1<br>
-    byte, end slot 1 byte, current slot 1 byte, enabled 1 byte) | checksum<br>
-<br>
+    This frame sets the start, end and current item to handle and
+    enables/disables the schedule. Start, end and current can be any value
+    0-255. Start cannot be past end. Current must be inside start and end.
+    Enabled i any value > 0.
+    Format:
+    message start | length of message | message type 2 | data (start slot 1
+    byte, end slot 1 byte, current slot 1 byte, enabled 1 byte) | checksum
+
 ##### Set frame
     This frame type is used to setup a specific LIN frame.
     Format:
@@ -1567,59 +1567,59 @@ A simple XOR checksum of all bytes in message including message length.<br>
         oneshot.
 
     frame flags:
-        Specifies the version of LIN protocoll to be used. Bit 0 - unset<br>
-        specifies that protocoll 1 is used for this frame.<br>
+        Specifies the version of LIN protocoll to be used. Bit 0 - unset
+        specifies that protocoll 1 is used for this frame.
 
     data length:
         Length of data to be sent or received. For receive frames expected
         data length must be set.
-<br>
+
 ##### Set item
-    This frame type is used to setup an item in the schedule. <br>
-    It specifies a position in the schedule were a given LIN id shall be<br>
-    handled. Multiple items with the same id can exist. How many LIN ticks<br>
-    the item shall use and if the item is enabled.<br>
-    Format:<br>
-    message start | length of message | message type 4 | data (frame number 1<br>
-    byte, LIN id 1 byte, LIN ticks 1 byte, enabled 1 byte) | checksum<br>
-<br>
-    frame number:<br>
-        Which slot in the scheudle. Value 0 - LIN_SCHEDULE_TABLE_ENRIES (256)<br>
-<br>
-    LIN id: <br>
-        Any valid LIN id.<br>
-    <br>
-    LIN ticks:<br>
-        How long time the item occupies. One tick is 10ms long.<br>
-<br>
-    Enable:<br>
-        Any value >0 to enable.<br>
-<br>
+    This frame type is used to setup an item in the schedule. 
+    It specifies a position in the schedule were a given LIN id shall be
+    handled. Multiple items with the same id can exist. How many LIN ticks
+    the item shall use and if the item is enabled.
+    Format:
+    message start | length of message | message type 4 | data (frame number 1
+    byte, LIN id 1 byte, LIN ticks 1 byte, enabled 1 byte) | checksum
+
+    frame number:
+        Which slot in the scheudle. Value 0 - LIN_SCHEDULE_TABLE_ENRIES (256)
+
+    LIN id: 
+        Any valid LIN id.
+    
+    LIN ticks:
+        How long time the item occupies. One tick is 10ms long.
+
+    Enable:
+        Any value >0 to enable.
+
 ##### Set baudrate
-    The defualt baudrate of this LIN implementation is 9600 bauds. The LIN<br>
-    specification states that baudrates 2400, 9600 and 19200 is supported.<br>
-    These rates are supported and rates 4800 and 10400 can also be set.<br>
-    Format:<br>
-    message start | length of message | message type 5 | data (baudrate<br>
-    enumerator 1 byte) | checksum<br>
-<br>
-    baudrate enumeration:<br>
-        2400 - 1<br>
-        4800 - 2<br>
-        9600 - 3<br>
-        10400 - 4<br>
-        19200 - 5<br>
-<br>
+    The defualt baudrate of this LIN implementation is 9600 bauds. The LIN
+    specification states that baudrates 2400, 9600 and 19200 is supported.
+    These rates are supported and rates 4800 and 10400 can also be set.
+    Format:
+    message start | length of message | message type 5 | data (baudrate
+    enumerator 1 byte) | checksum
+
+    baudrate enumeration:
+        2400 - 1
+        4800 - 2
+        9600 - 3
+        10400 - 4
+        19200 - 5
+
 ##### Set master
-    Configures LIN bus for either acting as master or just listening for LIN<br>
-    data on the bus. LIN bus is default configured as master.<br>
-    When configured as listener all valid messages will be forwarded. <br>
-    Format:<br>
-    message start | length of message | message type 6 | data (master/listen 1<br>
-    byte) | checksum<br>
-<br>
-    master - 1<br>
-    listen - 0<br>
+    Configures LIN bus for either acting as master or just listening for LIN
+    data on the bus. LIN bus is default configured as master.
+    When configured as listener all valid messages will be forwarded. 
+    Format:
+    message start | length of message | message type 6 | data (master/listen 1
+    byte) | checksum
+
+    master - 1
+    listen - 0
 ### Sample application for sending frames and receiving responses on Linux
 ```C
 #include <string.h>
