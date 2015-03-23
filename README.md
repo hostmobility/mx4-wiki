@@ -1493,9 +1493,9 @@ Work in progress...
 ## LIN
 
 How to control LIN via serial interface:<br>
-The LIN interface in the PIC is accessed via the serial console /dev/ttyHS2<br>
-with baudrate 115200. The LIN interface is controled via a set of predefined<br>
-frames, mostly used to alter the LIN schedule table.<br>
+The LIN interface in the PIC is accessed via the serial console /dev/ttyHS2 for LIN1
+with baudrate 115200. LIN2 is accessed via ttyHS0. Some hardwares (MX-4 T20/VF61) access LIN via ttyHS3 and ttyHS0. The LIN interface is controled via a set of predefined
+frames, mostly used to alter the LIN schedule table.
 <br>
 All frames sent to PIC is on the format:<br>
 ```
@@ -1503,7 +1503,7 @@ start of transmission | message length | message type | data | checksum<br>
 ```
 start of transmission (4 bytes):<br>
 This is a byte sequence used to indicate the start of a frame. <br>
-It consists of the 4 byte long sequence: 0x7e 0x7e 0x7e 0xa7<br>
+It consists of the 4 byte long sequence: ```0x7e 0x7e 0x7e 0xa7```<br>
 <br>
 message length (1 byte):<br>
 The length of message type (1 byte) + data (variable) + checksum (1 byte)<br>
