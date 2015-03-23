@@ -1732,7 +1732,7 @@ Byte 0, initial state. State configured as initial state will get the time confi
        <td>2</td>
    <tr>
 </table>
-5 << (8*3) | 20 << (8*2) | 6 << 8 | 2 = 85198338 <br>
+5 << (8 * 3) | 20 << (8 * 2) | 6 << 8 | 2 = 85198338 <br>
 #### One-shot flash
 To configure one-shot flash an initial state and a finishing state is configured with the time for the initial state configured in byte 3.
 Initial state is configured in byte 0 and finishing state is configured in byte 1. This means that in byte 1 we can just put one state and that state will be kept until a new value is sent to the led.
