@@ -31,6 +31,7 @@
 			- [Digital Inputs](#wake-on-digital-inputs)
 			- [Analog Inputs](#wake-on-analog-inputs)
 			- [CAN](#wake-on-can)
+	- [Deep Sleep](#deep-sleep)
 	- [Shutdown/Cutoff](#shutdown)
 - [Communication Interfaces](#communication-interfaces)
 	- [Serial Devices](#serial-devices)
@@ -1561,7 +1562,7 @@ A simple XOR checksum of all bytes in message including message length.<br>
     0-LIN_MAX_DATABYTES) | checksum
 
     LIN id can be any valid LIN id. 0-64.
-    frame options: 
+    frame options:
         Specifies if frame is send/receive. Bit 0 - unset specifies frame is
         send fram. Bit 1 - if response shall be forwardet. Bit 3 - if frame is
         oneshot.
@@ -1575,7 +1576,7 @@ A simple XOR checksum of all bytes in message including message length.<br>
         data length must be set.
 
 ##### Set item
-    This frame type is used to setup an item in the schedule. 
+    This frame type is used to setup an item in the schedule.
     It specifies a position in the schedule were a given LIN id shall be
     handled. Multiple items with the same id can exist. How many LIN ticks
     the item shall use and if the item is enabled.
@@ -1586,9 +1587,9 @@ A simple XOR checksum of all bytes in message including message length.<br>
     frame number:
         Which slot in the scheudle. Value 0 - LIN_SCHEDULE_TABLE_ENRIES (256)
 
-    LIN id: 
+    LIN id:
         Any valid LIN id.
-    
+
     LIN ticks:
         How long time the item occupies. One tick is 10ms long.
 
@@ -1613,7 +1614,7 @@ A simple XOR checksum of all bytes in message including message length.<br>
 ##### Set master
     Configures LIN bus for either acting as master or just listening for LIN
     data on the bus. LIN bus is default configured as master.
-    When configured as listener all valid messages will be forwarded. 
+    When configured as listener all valid messages will be forwarded.
     Format:
     message start | length of message | message type 6 | data (master/listen 1
     byte) | checksum
@@ -1653,7 +1654,7 @@ int main(int argc, char *argv[]) {
     tio.c_oflag = 0;
     tio.c_lflag = 0;
     tio.c_cc[VTIME] = 0;
-    
+
     tcflush(fd, TCIFLUSH);
     tcsetattr(fd, TCSANOW, &tio);
 
@@ -1684,7 +1685,7 @@ int main(int argc, char *argv[]) {
         if (!buff[5]) {
             fprintf(stderr, "No valid command.\n");
             return 1;
-        } 
+        }
 
         for (i = 2; i < argc; i++) {
             sscanf(argv[i], "%d", &buff[4 + i]);
@@ -2082,6 +2083,7 @@ default:CARD=T20 // AC97
 The MX-4 platform has three different operating modes:
 - Running
 - Sleep
+- Deep Sleep
 - Shutdown/Cutoff
 
 ### Running
@@ -2122,13 +2124,22 @@ List of periphials that will lose power and that need to be re-initalized after 
 Host Mobility provides a script to easy enter sleep/suspend mode. The script is `/opt/hm/go_to_sleep.sh`.
 
 ```bash
-Usage: go_to_sleep.sh options (:thdc)
+Usage: go_to_sleep.sh options (t:hdcnsaD)
                 -t <time in seconds> - Setup wakealarm (rtc)
                 -d - Disable wake on DIGITAL-IN-2
+                -a - Disable wake on START-SIGNAL
+                -l <mV level> - START-SIGNAL wake-up volt level
                 -c - Wake on CAN
                 -n - Will renew dhcp lease
                 -s - Will suspend modem (turn off), Will not restore on wake up
+                -D <time in seconds> - Will enter deep sleep.
+                        Power to main CPU will be cut after specified time and it
+                        will restart with a cold reboot on wake up. The application
+                        is responsible of shutting down the system properly before
+                        the power is cut.
+                -p <wake up mask> - Mask to enable/disable wakeup sources
                 -h - Print this text
+
 ```
 
 #### Wakeup
@@ -2217,6 +2228,14 @@ To disable wakeup for a specific bus one has to write a 1 to that GPIO's value.
 root@mx4-vcc-1000000:~# echo 1 > /sys/class/gpio/gpio58/value
 
 ```
+
+### Deep Sleep
+
+Deep sleep mode means that we put the co-cpu in a sleep mode while cutting the power rail to the main CPU. This means that upon wake up we will have a cold reboot instead of a fast resume, this trade off is for lower consumtion during the suspended state.
+
+Wakeup sources available from deep sleep vary on different platforms.
+
+Deep sleep is entered by passing the -D option to `go_to_sleep.sh`. See [Enter sleep](#enter-sleep)
 
 ### Shutdown
 
