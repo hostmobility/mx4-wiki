@@ -1495,7 +1495,9 @@ Work in progress...
 
 How to control LIN via serial interface:<br>
 The LIN interface in the PIC is accessed via the serial console /dev/ttyHS2 for LIN1
-with baudrate 115200. LIN2 is accessed via ttyHS0. Some hardwares (MX-4 T20/VF61) access LIN via ttyHS3 and ttyHS0. The LIN interface is controled via a set of predefined
+with baudrate 115200. LIN2 is accessed via ttyHS0. Some hardwares (MX-4 T20/VF61) access LIN via ttyHS3 and ttyHS0. 
+On Vybrid LIN is accessed via ttyLP2 and LIN2 via ttyLP1. Note that on ttyLP1 CRTSCTS must NOT be enabled or the communication will lock.
+The LIN interface is controled via a set of predefined
 frames, mostly used to alter the LIN schedule table.
 <br>
 All frames sent to PIC is on the format:<br>
