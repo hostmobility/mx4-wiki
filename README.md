@@ -2213,7 +2213,7 @@ Analog inputs as wakeup sources are not handled by `go_to_sleep.sh`.
 
 All analog inputs have four sysfs files associated with them. If we take input voltage as an example:
 ```bash
-root@mx4-vcc-1000000:/sys/bus/spi/devices/spi3.0# ls input_voltage_*
+root@mx4-vcc-1000000:/sys/bus/spi/devices/spi3.0# ls input_voltage*
 input_voltage_calibration_u      input_voltage_threshold_high
 input_voltage                 input_voltage_threshold_low
 ```
