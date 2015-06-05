@@ -897,7 +897,7 @@ Default username: `root` password: `none`
 One can read out the system reset cause from a spi attribute.
 
 ```bash
-root@ultra14211046:~# cat /sys/bus/spi/devices/spi3.0/ctrl_pic_reset_cause
+root@ultra14211046:~# cat /opt/hm/pic_attributes/ctrl_pic_reset_cause
 1
 ```
 
@@ -1142,7 +1142,7 @@ $IPT -P OUTPUT ACCEPT
 
 The MX-4 board is equipped with a 3G modem. It is not started by default when the unit is powered one but has to be explicitly turned on with the following command:
 
-     root@mx4-gtt:~# echo 1 > /sys/bus/spi/devices/spi3.0/ctrl_modem_on
+     root@mx4-gtt:~# echo 1 > /opt/hm/pic_attributes/ctrl_modem_on
 
 if PH8 is powered on, following ports will be created
 * /dev/ttyUSB0 --> Reserved port (not usable)
@@ -1170,7 +1170,7 @@ You should get an output similar to the following:
 The modem can also be turned off with this command.
 
 ```bash
-root@mx4-gtt:~# echo 0 > /sys/bus/spi/devices/spi3.0/ctrl_modem_on
+root@mx4-gtt:~# echo 0 > /opt/hm/pic_attributes/ctrl_modem_on
 ```
 
 ### Creating a PPP connection
@@ -1495,7 +1495,7 @@ Work in progress...
 
 How to control LIN via serial interface:<br>
 The LIN interface in the PIC is accessed via the serial console /dev/ttyHS2 for LIN1
-with baudrate 115200. LIN2 is accessed via ttyHS0. Some hardwares (MX-4 T20/VF61) access LIN via ttyHS3 and ttyHS0. 
+with baudrate 115200. LIN2 is accessed via ttyHS0. Some hardwares (MX-4 T20/VF61) access LIN via ttyHS3 and ttyHS0.
 On Vybrid LIN is accessed via ttyLP2 and LIN2 via ttyLP1. Note that on ttyLP1 CRTSCTS must NOT be enabled or the communication will lock.
 The LIN interface is controled via a set of predefined
 frames, mostly used to alter the LIN schedule table.
@@ -1850,26 +1850,26 @@ Example app listening for GPIO events.
 The ADC conversions are managed by the co-processor and the values are exposed as sysfiles.
 
 ```bash
-root@mx4-gtt:~# ls /sys/bus/spi/devices/spi3.0/ | grep -i analog
+root@mx4-gtt:~# ls /opt/hm/pic_attributes/ | grep -i analog
 analog_1_calibration_u
 analog_1_uA
 analog_2_calibration_u
 analog_2_uA
 analog_3_calibration_u
-analog_3_mV
+analog_3
 analog_4_calibration_u
-analog_4_mV
-root@mx4-gtt:~# ls /sys/bus/spi/devices/spi3.0/ | grep -i input
+analog_4
+root@mx4-gtt:~# ls /opt/hm/pic_attributes/ | grep -i input
 input_battery_calibration_u
-input_battery_mV
-input_battery_threshold_high_mV
-input_battery_threshold_low_mV
+input_battery
+input_battery_threshold_high
+input_battery_threshold_low
 input_temperature_calibration_u
 input_temperature_mC
 input_voltage_calibration_u
-input_voltage_mV
-input_voltage_threshold_high_mV
-input_voltage_threshold_low_mV
+input_voltage
+input_voltage_threshold_high
+input_voltage_threshold_low
 ```
 
 Calibration files are not be used by end users.
@@ -1877,7 +1877,7 @@ Calibration files are not be used by end users.
 #### Example reading input voltage
 
 ```bash
-root@mx4-gtt:~# cat /sys/bus/spi/devices/spi3.0/input_voltage_mV
+root@mx4-gtt:~# cat /opt/hm/pic_attributes/input_voltage
 14917
 ```
 
@@ -1890,7 +1890,7 @@ has been turned off.
 
 ```bash
 root@mx4-gtt:~# echo 0 > /sys/class/gpio/gpio243/value
-root@mx4-gtt:~# cat /sys/bus/spi/devices/spi3.0/input_voltage_mV
+root@mx4-gtt:~# cat /opt/hm/pic_attributes/input_voltage
 cat: read error: Operation not permitted
 ```
 ## LED
@@ -2126,7 +2126,7 @@ List of periphials that will lose power and that need to be re-initalized after 
 Host Mobility provides a script to easy enter sleep/suspend mode. The script is `/opt/hm/go_to_sleep.sh`.
 
 ```bash
-Usage: go_to_sleep.sh options (t:hdcnsaD)
+Usage: go_to_sleep.sh options (t:D:hdcnsal:p:)
                 -t <time in seconds> - Setup wakealarm (rtc)
                 -d - Disable wake on DIGITAL-IN-2
                 -a - Disable wake on START-SIGNAL
@@ -2157,9 +2157,55 @@ Note that not all MX-4 platforms supports all wakeup sources.
 
 ##### Wake on Digital Inputs
 
-Enabling of digital inputs as wakeup source is handled by `go_to_sleep.sh`. See [Enter sleep](#enter-sleep).
+By default DIGITAL-IN-2 (rising edge) is enabled as wakeup source. This is mostly for historical reasons. To disable it one can pass `-d` option to `go_to_sleep.sh`.
 
-The only wakeup source that is enabled by default is DIGITAL-IN-2.
+On some platforms DIGITAL-IN-2 is the only digital input that is capable to wake up the system.
+
+If your output of `cat /sys/kernel/debug/gpio | grep digital` looks like below
+
+```
+GPIOs 238-273, spi/spi3.0, mx4_digitals:
+ gpio-238 (digital-out-1       ) out lo
+ gpio-239 (digital-out-2       ) out lo
+ gpio-240 (digital-out-3       ) out lo
+ gpio-241 (digital-out-4       ) out lo
+ gpio-242 (digital-out-5 / 4-20) out lo
+ gpio-243 (digital-out-6       ) out lo
+ gpio-250 (digital-in-1 / sc   ) in  hi
+ gpio-251 (digital-in-2 / sc   ) in  hi
+ gpio-252 (digital-in-3 / sc   ) in  hi
+ gpio-253 (digital-in-4 / sc   ) in  hi
+ gpio-254 (digital-in-5 / sc   ) in  lo
+ gpio-255 (digital-in-6        ) in  lo
+```
+Then your system is capable of having all digital inputs as wakeup sources.
+
+To enable different wakeup sources and to set edge, the `-p` option is used. The `-p` takes an argument which should be a bitmask of following.
+
+```
+#define WAKE_UP_TRIGGER_CAN             (1UL << 0)
+#define WAKE_UP_TRIGGER_DIN_1_F         (1UL << 1)
+#define WAKE_UP_TRIGGER_DIN_1_R         (1UL << 2)
+#define WAKE_UP_TRIGGER_DIN_2_F         (1UL << 3)
+#define WAKE_UP_TRIGGER_DIN_2_R         (1UL << 4)
+#define WAKE_UP_TRIGGER_DIN_3_F         (1UL << 5)
+#define WAKE_UP_TRIGGER_DIN_3_R         (1UL << 6)
+#define WAKE_UP_TRIGGER_DIN_4_F         (1UL << 7)
+#define WAKE_UP_TRIGGER_DIN_4_R         (1UL << 8)
+#define WAKE_UP_TRIGGER_DIN_5_F         (1UL << 9)
+#define WAKE_UP_TRIGGER_DIN_5_R         (1UL << 10)
+#define WAKE_UP_TRIGGER_DIN_6_F         (1UL << 11)
+#define WAKE_UP_TRIGGER_DIN_6_R         (1UL << 12)
+#define WAKE_UP_TRIGGER_MODEM_RING      (1UL << 13)
+#define WAKE_UP_TRIGGER_START_SWITCH_F  (1UL << 14)
+#define WAKE_UP_TRIGGER_START_SWITCH_R  (1UL << 15)
+#define WAKE_UP_TRIGGER_MIN_1_F         (1UL << 16)
+#define WAKE_UP_TRIGGER_MIN_1_R         (1UL << 17)
+#define WAKE_UP_TRIGGER_MIN_2_F         (1UL << 18)
+#define WAKE_UP_TRIGGER_MIN_2_R         (1UL << 19)
+```
+
+NOTE! If `-d` option is not specified it will always set bit 4 in the wakeup mask, regardless of what you passed.
 
 ##### Wake on Analog Inputs
 
@@ -2168,37 +2214,37 @@ Analog inputs as wakeup sources are not handled by `go_to_sleep.sh`.
 All analog inputs have four sysfs files associated with them. If we take input voltage as an example:
 ```bash
 root@mx4-vcc-1000000:/sys/bus/spi/devices/spi3.0# ls input_voltage_*
-input_voltage_calibration_u      input_voltage_threshold_high_mV
-input_voltage_mV                 input_voltage_threshold_low_mV
+input_voltage_calibration_u      input_voltage_threshold_high
+input_voltage                 input_voltage_threshold_low
 ```
 
-- `input_voltage_mV` is the file where we read the value of input voltage.
+- `input_voltage` is the file where we read the value of input voltage.
 - `input_voltage_calibration_u` is used internally by Host Mobility to calibrate the input for component tolerances.
-- `input_voltage_threshold_high_mV` is used to enable wake on a high level threshold
-- `input_voltage_threshold_low_mV` is used to enable wake on low level threshold.
+- `input_voltage_threshold_high` is used to enable wake on a high level threshold
+- `input_voltage_threshold_low` is used to enable wake on low level threshold.
 
 Some wakeup setup examples:
 
 ```bash
 # Wakeup system from sleep/suspend if input voltage is above 16 V
-root@mx4-vcc-1000000:~# echo 16000 > /sys/bus/spi/devices/spi3.0/input_voltage_threshold_high_mV
+root@mx4-vcc-1000000:~# echo 16000 > /opt/hm/pic_attributes/input_voltage_threshold_high
 ```
 
 ```bash
 # Wakeup system from sleep/suspend if input voltage is below 12 V
-root@mx4-vcc-1000000:~# echo 12000 > /sys/bus/spi/devices/spi3.0/input_voltage_threshold_low_mV
+root@mx4-vcc-1000000:~# echo 12000 > /opt/hm/pic_attributes/input_voltage_threshold_low
 ```
 
 ```bash
 # Wakeup system from sleep/suspend if input voltage is in the range of 12-16 V
-root@mx4-vcc-1000000:~# echo 16000 > /sys/bus/spi/devices/spi3.0/input_voltage_threshold_high_mV
-root@mx4-vcc-1000000:~# echo 12000 > /sys/bus/spi/devices/spi3.0/input_voltage_threshold_low_mV
+root@mx4-vcc-1000000:~# echo 16000 > /opt/hm/pic_attributes/input_voltage_threshold_high
+root@mx4-vcc-1000000:~# echo 12000 > /opt/hm/pic_attributes/input_voltage_threshold_low
 ```
 
 ```bash
 # Write 0 to both threshold files to disable that specific input as wakeup source
-root@mx4-vcc-1000000:~# echo 0 > /sys/bus/spi/devices/spi3.0/input_voltage_threshold_high_mV
-root@mx4-vcc-1000000:~# echo 0 > /sys/bus/spi/devices/spi3.0/input_voltage_threshold_low_mV
+root@mx4-vcc-1000000:~# echo 0 > /opt/hm/pic_attributes/input_voltage_threshold_high
+root@mx4-vcc-1000000:~# echo 0 > /opt/hm/pic_attributes/input_voltage_threshold_low
 ```
 User has to setup analog wakeup sources prior to calling `go_to_sleep.sh`. See [Enter sleep](#enter-sleep)
 
@@ -2247,7 +2293,7 @@ The MX-4 shutdown/cutoff state is where system is turned off with close to zero 
 
 ```bash
 # Cutoff in 60 seconds
-root@mx4-vcc-1000000:~# echo 60 > /sys/bus/spi/devices/spi3.0/ctrl_on_4v
+root@mx4-vcc-1000000:~# echo 60 > /opt/hm/pic_attributes/ctrl_on_4v
 ```
 
 The above means that in 60 seconds we will cut the 4 V which the whole system
@@ -2257,7 +2303,7 @@ Before these 60 seconds run out the application should have finished and
 run the command `poweroff` to shutdown Linux.
 
 ```bash
-root@mx4-vcc-1000000:~# echo 60 > /sys/bus/spi/devices/spi3.0/ctrl_on_4v
+root@mx4-vcc-1000000:~# echo 60 > /opt/hm/pic_attributes/ctrl_on_4v
 root@mx4-vcc-1000000:~# poweroff
 Sending SIGTERM to remaining processes...
 Sending SIGKILL to remaining processes...
