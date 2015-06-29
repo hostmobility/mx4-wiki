@@ -58,6 +58,7 @@
 		- [Set input as interrupt](#set-input-as-interrupt)
 	- [Analog](#analog)
 - [LED](#led)
+	- [Buzzer](#buzzer)
 	- [Frequency](#frequency)
 	- [Flash config](#flash-config)
 	- [Current LED](#current-led)
