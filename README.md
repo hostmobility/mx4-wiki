@@ -73,8 +73,6 @@
 
 ## Overview
 
-Work in progress...
-
 ### Soft deliverables
 
 When you buy a MX-4 hardware from Host Mobility AB the following is included.
@@ -162,8 +160,6 @@ Host Mobility AB provides access to our build server which is based on Jenkins s
 It is also possible to setup a customer specific build job on request where one could integrate the customer application in the MX-4 platform build system or build a branch of the MX-4 platform repository.
 
 ## Build Environment
-
-Work in progress..
 
 List of supported distros can be found at http://www.yoctoproject.org/docs/1.4.1/ref-manual/ref-manual.html#detailed-supported-distros
 
