@@ -1755,7 +1755,8 @@ See [Linux Kernel GPIO documentation](https://www.kernel.org/doc/Documentation/g
 Note! GPIO numbers can differ on different MX-4 platforms. This is just an example.
 
 ```bash
-root@mx4-gtt:/opt/hm# cat /sys/kernel/debug/gpio | grep -i digital
+root@mx4-vcc-1000000:~# cat /sys/kernel/debug/gpio | grep -i digital
+# MAIN-CPU
  gpio-23  (P43 - DIGITAL-IN-2  ) in  hi
  gpio-162 (P110 - DIGITAL-IN-1 ) in  hi
  gpio-171 (P45 - DIGITAL-IN-3  ) in  hi
@@ -1765,18 +1766,25 @@ root@mx4-gtt:/opt/hm# cat /sys/kernel/debug/gpio | grep -i digital
 ```
 
 ```bash
-GPIOs 238-255, mx4_digitals:
- gpio-238 (mx4 - digital out 1 ) out lo
- gpio-239 (mx4 - digital out 2 ) out lo
- gpio-240 (mx4 - digital out 3 ) out lo
- gpio-241 (mx4 - digital out 4 ) out lo
- gpio-247 (mx4 - sc digital out) out lo
- gpio-248 (mx4 - sc digital out) out lo
- gpio-249 (mx4 - sc digital out) out lo
- gpio-250 (mx4 - sc digital out) out lo
+# CO-CPU
+GPIOs 238-273, spi/spi3.0, mx4_digitals:
+ gpio-238 (digital-out-1       ) out lo
+ gpio-239 (digital-out-2       ) out lo
+ gpio-240 (digital-out-3       ) out lo
+ gpio-241 (digital-out-4       ) out lo
+ gpio-242 (digital-out-5 / 4-20) out lo
+ gpio-243 (digital-out-6       ) out lo
+ gpio-250 (digital-in-1 / sc   ) in  lo
+ gpio-251 (digital-in-2 / sc   ) in  lo
+ gpio-252 (digital-in-3 / sc   ) in  lo
+ gpio-253 (digital-in-4 / sc   ) in  lo
+ gpio-254 (digital-in-5 / sc   ) in  lo
+ gpio-255 (digital-in-6        ) in  lo
 ```
 
-`sc digital out` are inputs indicating short for each output. If a short is detected it goes HIGH (1).
+`digital-in-1 / sc` is short detect input or digital input. Depending on MX-4 type.
+
+NOTE! If the digital inputs are present on the MAIN-CPU GPIO list, those are to be used and those in co-cpu are short detect signals.
 
 #### Read gpio value
 
@@ -1804,72 +1812,125 @@ It is also possible to set falling or both to edge file.
 
 Example app listening for GPIO events.
 ```c
-	#include <stdio.h>
-	#include <fcntl.h>
-	#include <poll.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <poll.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <string.h>
 
-	int main (int argc, char *argv[])
+int main (int argc, char *argv[])
+{
+	char* path;
+	char buf[10];
+	ssize_t bytes;
+
+	struct pollfd fds;
+
+	if (argc != 2)
 	{
-		char* path;
-		struct pollfd fds;
-		int ret;
-
-		if (argc != 2){
-			printf("The file descriptor to listen is needed as first (and only) parameter\n");
-			return 1;
-		}
-
-		path = argv[1];
-
-		fds.fd = open (path, O_RDONLY);
-
-		if (!fds.fd){
-			printf("Unable to open file descriptor\n");
-			return 1;
-		}
-
-		fds.events = POLLERR | POLLPRI;
-		fds.revents = 0;
-		printf ("listening for events in:%s\n", path);
-
-		char val;
-
-		while (1){
-			read (fds.fd, 0, 0);
-			if (poll (&fds, 1, -1) > 0) {
-				printf ("event received\n");
-			}
-		}
-
-		printf ("Finish\n");
-		return 0;
+		printf("The file descriptor to listen is needed as first (and only) parameter\n");
+		return 1;
 	}
+
+	path = argv[1];
+
+	fds.fd = open (path, O_RDONLY);
+
+	if (!fds.fd)
+	{
+		printf("Unable to open file descriptor\n");
+		return 1;
+	}
+
+	fds.events = POLLERR | POLLPRI;
+	fds.revents = 0;
+	printf ("listening for events in:%s\n", path);
+
+	while (1)
+	{
+		printf("-- poll start -- \n");
+		if (poll (&fds, 1, -1) > 0)
+		{
+			lseek(fds.fd, 0, SEEK_SET);
+			bytes = read (fds.fd, buf, 10);
+			if (bytes < 0)
+				printf("Error on read: %s", strerror(errno));
+
+			printf("%s : %s\n", path, buf);
+
+			if (fds.revents & POLLPRI)
+				printf("POLLPRI event recieved\n");
+
+			if (fds.revents & POLLERR)
+				printf("POLLERR event recieved\n");
+
+			if (fds.revents & POLLIN)
+				printf("POLLIN event recieved\n");
+
+			if (fds.revents & POLLOUT)
+				printf("POLLOUT event recieved\n");
+
+			if (fds.revents & POLLHUP)
+				printf("POLLHUP event recieved\n");
+
+			if (fds.revents & POLLNVAL)
+				printf("POLLNVAL event recieved\n");
+		}
+		printf("-- poll end -- \n\n");
+	}
+
+	printf ("Finish\n");
+	return 0;
+}
+
 ```
 ### Analog
 
 The ADC conversions are managed by the co-processor and the values are exposed as sysfiles.
 
 ```bash
-root@mx4-gtt:~# ls /opt/hm/pic_attributes/ | grep -i analog
+root@mx4-vcc-1000000:~# ls /opt/hm/pic_attributes | grep -i analog
+analog_1
 analog_1_calibration_u
-analog_1_uA
+analog_1_threshold_high
+analog_1_threshold_low
+analog_2
 analog_2_calibration_u
-analog_2_uA
-analog_3_calibration_u
+analog_2_threshold_high
+analog_2_threshold_low
 analog_3
-analog_4_calibration_u
+analog_3_calibration_u
+analog_3_threshold_high
+analog_3_threshold_low
 analog_4
-root@mx4-gtt:~# ls /opt/hm/pic_attributes/ | grep -i input
-input_battery_calibration_u
+analog_4_calibration_u
+analog_4_threshold_high
+analog_4_threshold_low
+
+root@mx4-vcc-1000000:~# ls /opt/hm/pic_attributes | grep -i input
 input_battery
+input_battery_calibration_u
 input_battery_threshold_high
 input_battery_threshold_low
 input_temperature_calibration_u
 input_temperature_mC
-input_voltage_calibration_u
 input_voltage
+input_voltage_calibration_u
 input_voltage_threshold_high
 input_voltage_threshold_low
+
+root@mx4-vcc-1000000:~# ls /opt/hm/pic_attributes | grep -i start_signal
+start_signal
+start_signal_calibration_u
+start_signal_threshold_high
+start_signal_threshold_low
+
+root@mx4-vcc-1000000:~# ls /opt/hm/pic_attributes | grep -i super_cap
+super_cap
+super_cap_calibration_u
+
 ```
 
 Calibration files are not be used by end users.
@@ -2143,6 +2204,8 @@ Usage: go_to_sleep.sh options (t:D:hdcnsal:p:)
                 -h - Print this text
 
 ```
+
+NOTE! `-p` argument is only for MX-4 T20 and MX-4 V61 who has all wake-up sources in CO-CPU.
 
 #### Wakeup
 
