@@ -1974,6 +1974,11 @@ LED flashing is configured by sending 4 bytes on corresponding led_-file in Linu
    <tr>
 </table>
 
+### Buzzer
+On some boards there is a buzzer present. Path is `/opt/hm/pic_attributes/buzzer`.
+
+The `buzzer` attribute supports the same API as LED´s as described below.
+
 ### Frequency
 Frequency is configured according to:<br>
 0 - Flashing off <br>
