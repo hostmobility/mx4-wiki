@@ -1522,6 +1522,7 @@ Linux.<br>
 4. [Set item](#set-item). Setup a LIN schedule item.<br>
 5. [Set baudrate](#set-baudrate). Setup LIN baudrate.<br>
 6. [Set master](#set-master). Setup master/listen mode.<br>
+7. [Listen message](#listen-message)
 <br>
 Defined in lin_general.h as:<br>
 ```c
