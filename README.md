@@ -1523,7 +1523,7 @@ Linux.<br>
 5. [Set baudrate](#set-baudrate). Setup LIN baudrate.<br>
 6. [Set master](#set-master). Setup master/listen mode.<br>
 <br>
-Defined in lin.h as:<br>
+Defined in lin_general.h as:<br>
 ```c
 #define MSG_RECV_RESPONSE 1
 #define MSG_SET_SCHEDULE 2
@@ -1531,6 +1531,7 @@ Defined in lin.h as:<br>
 #define MSG_SET_ITEM 4
 #define MSG_SET_BAUDRATE 5
 #define MSG_SET_MASTER 6
+#define MSG_LISTEN_MSG 7
 ```
 <br>
 data (variable):<br>
@@ -1623,6 +1624,41 @@ A simple XOR checksum of all bytes in message including message length.<br>
 
     master - 1
     listen - 0
+#### Listen message
+	When the LIN bus is in listen mode messages will be sent to Linux user space when data are found on the bus.
+	Format:
+	message start | length of message | message type 7 | status| data | checksum
+
+	status: 
+	Defined statuses:
+	```C
+	#define STATUS_OK 0
+	#define STATUS_RECV_ERROR 1
+	#define STATUS_RECV_NO_DATA 2
+	```
+	STATUS_RECV_ERROR indicates that data have been read on the bus, but no valid LIN frame were found. Just all the data is returned for debuging purposes.
+	STATUS_RECV_NO_DATA activity on the bus but no data found.
+
+	data:
+	The LIN frame. 
+	id | data | LIN checksum
+	id: With parity omit bit 7 and 6 for id without parity
+	LIN checksum: If it is a valid frame the checksum is here
+### Status message
+	All commands sent to PIC, except listen which is no command, will return a status message. 
+	Format:
+	message start | status
+	status: One byte status, 0 status ok
+	```C
+	#define ERROR_ARGUMENT_COUNT 1
+	#define ERROR_START_NOT_VALID 2
+	#define ERROR_STOP_NOT_VALID 3
+	#define ERROR_START_AFTER_STOP 4
+	#define ERROR_SLOT_NOT_VALID 5
+	#define ERROR_NOT_VALID_ENTRY 6
+	#define ERROR_INVALID_LIN_ID 7
+	#define ERROR_TO_LONG_FRAME 8
+	```
 ### Sample application for sending frames and receiving responses on Linux
 ```C
 #include <string.h>
