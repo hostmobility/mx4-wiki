@@ -1632,11 +1632,11 @@ A simple XOR checksum of all bytes in message including message length.<br>
 
 	status: 
 	Defined statuses:
-	```C
-	#define STATUS_OK 0
-	#define STATUS_RECV_ERROR 1
-	#define STATUS_RECV_NO_DATA 2
-	```
+```C
+#define STATUS_OK 0
+#define STATUS_RECV_ERROR 1
+#define STATUS_RECV_NO_DATA 2
+```
 	STATUS_RECV_ERROR indicates that data have been read on the bus, but no valid LIN frame were found. Just all the data is returned for debuging purposes.
 	STATUS_RECV_NO_DATA activity on the bus but no data found.
 
@@ -1650,15 +1650,15 @@ A simple XOR checksum of all bytes in message including message length.<br>
 	Format:
 	message start | status
 	status: One byte status, 0 status ok
-	```C
-	#define ERROR_ARGUMENT_COUNT 1
-	#define ERROR_START_NOT_VALID 2
-	#define ERROR_STOP_NOT_VALID 3
-	#define ERROR_START_AFTER_STOP 4
-	#define ERROR_SLOT_NOT_VALID 5
-	#define ERROR_NOT_VALID_ENTRY 6
-	#define ERROR_INVALID_LIN_ID 7
-	#define ERROR_TO_LONG_FRAME 8
+```C
+#define ERROR_ARGUMENT_COUNT 1
+#define ERROR_START_NOT_VALID 2
+#define ERROR_STOP_NOT_VALID 3
+#define ERROR_START_AFTER_STOP 4
+#define ERROR_SLOT_NOT_VALID 5
+#define ERROR_NOT_VALID_ENTRY 6
+#define ERROR_INVALID_LIN_ID 7
+#define ERROR_TO_LONG_FRAME 8
 	```
 ### Sample application for sending frames and receiving responses on Linux
 ```C
@@ -1882,6 +1882,11 @@ Example app listening for GPIO events.
 		return 0;
 	}
 ```
+#### Multiplexed digital IO
+Devices with IO pins with multiple functions, digital IO and LIN, must disable LIN before 
+using the digital IO functionality. This is controled via the virtual gpios
+LINx enabled. When the LIN channel is disabled the 
+
 ### Analog
 
 The ADC conversions are managed by the co-processor and the values are exposed as sysfiles.
