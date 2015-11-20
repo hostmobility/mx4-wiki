@@ -69,6 +69,7 @@
 		- [ERROR-STATE](#error-state)
 		- [FIRMWARE-UPGRADE](#firmware-upgrade)
 - [Package Manager](#package-manager)
+- [Accelerometer](#accelerometer)
 
 ## Overview
 
@@ -2383,3 +2384,72 @@ To install something run for instance<br>
 opkg install rsync
 ```
 
+## Accelerometer
+The MX-4 is quipped with a Freescale MMA8452 accelerometer. 
+Datasheet: (http://www.freescale.com/files/sensors/doc/data_sheet/MMA8452Q.pdf)
+
+### Usage on VF61-based systems
+    Path in sysfs: /sys/bus/iio/devices/iio:device0
+    Read x,y,z: in_accel_{x,y,z}_raw
+
+    At the moment this driver only supports reading of coordinates via sysfs.
+
+### Usage on T20-based systems
+Path in sysfs: /sys/class/sensor/mma/ 
+Read x,y,z: value_{x,y,z}
+
+Interrupts from the accelerometer are routed to two GPIOs on the Colibri
+module. The GPIOs are not exported.
+Data ready is routed to INT1, other interrupts are routed to INT2.
+INT1 is the first mma interrupt seen in /proc/interrupts.
+
+All data generated from interrupts are accessed via chardevs.
+```bash
+lsinput
+/dev/input/event0
+   bustype : (null)
+   vendor  : 0x0
+   product : 0x0
+   version : 0
+   name    : "mma845x"
+   bits ev : EV_SYN EV_ABS
+
+/dev/input/event1
+   bustype : (null)
+   vendor  : 0x0
+   product : 0x0
+   version : 0
+   name    : "Accl1"
+   bits ev : EV_SYN EV_KEY EV_ABS EV_MSC
+```
+mma845x is for coordinate data. Accl1 is for configured interrupts.
+
+
+Most of the possibilities mentioned in the mma8452 datasheet are available for
+configuration via the driver sysfs interface.  
+
+Example for testing transient interrupts.
+```bash
+cd /sys/class/sensor/mma/transitent_detection0
+echo enable,enable,enable > enable
+echo 1 > threshold # set lowest possible threshold for transient
+input-events 1
+# Move the device to generate a movement transient
+# Output:
+dev/input/event1
+   bustype : (null)
+   vendor  : 0x0
+   product : 0x0
+   version : 0
+   name    : "Accl1"
+   bits ev : EV_SYN EV_KEY EV_ABS EV_MSC
+
+waiting for events
+00:18:33.808626: EV_KEY KEY_LEFTSHIFT pressed
+00:18:33.808629: EV_KEY KEY_G pressed
+00:18:33.808633: EV_KEY KEY_G released
+00:18:33.808635: EV_KEY KEY_LEFTSHIFT released
+00:18:33.808639: EV_ABS ??? 96
+00:18:33.808643: EV_ABS ??? 0
+00:18:33.808644: EV_SYN code=0 value=0
+```
