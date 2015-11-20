@@ -2385,18 +2385,18 @@ opkg install rsync
 ```
 
 ## Accelerometer
-The MX-4 is quipped with a Freescale MMA8452 accelerometer. 
+The MX-4 is equipped with a Freescale MMA8452 accelerometer. 
 Datasheet: (http://www.freescale.com/files/sensors/doc/data_sheet/MMA8452Q.pdf)
 
 ### Usage on VF61-based systems
-    Path in sysfs: /sys/bus/iio/devices/iio:device0
-    Read x,y,z: in_accel_{x,y,z}_raw
+Path in sysfs: /sys/bus/iio/devices/iio:device0<br>
+Read x,y,z: in_accel_{x,y,z}_raw<br>
 
-    At the moment this driver only supports reading of coordinates via sysfs.
+At the moment this driver only supports reading of coordinates via sysfs.
 
 ### Usage on T20-based systems
-Path in sysfs: /sys/class/sensor/mma/ 
-Read x,y,z: value_{x,y,z}
+Path in sysfs: /sys/class/sensor/mma/ <br>
+Read x,y,z: value_{x,y,z} <br>
 
 Interrupts from the accelerometer are routed to two GPIOs on the Colibri
 module. The GPIOs are not exported.
