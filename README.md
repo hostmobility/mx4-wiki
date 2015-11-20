@@ -2388,13 +2388,13 @@ opkg install rsync
 The MX-4 is equipped with a Freescale MMA8452 accelerometer. 
 Datasheet: (http://www.freescale.com/files/sensors/doc/data_sheet/MMA8452Q.pdf)
 
-### Usage on VF61-based systems
+#### Usage on VF61-based systems
 Path in sysfs: /sys/bus/iio/devices/iio:device0<br>
 Read x,y,z: in_accel_{x,y,z}_raw<br>
 
 At the moment this driver only supports reading of coordinates via sysfs.
 
-### Usage on T20-based systems
+#### Usage on T20-based systems
 Path in sysfs: /sys/class/sensor/mma/ <br>
 Read x,y,z: value_{x,y,z} <br>
 
@@ -2404,6 +2404,7 @@ Data ready is routed to INT1, other interrupts are routed to INT2.
 INT1 is the first mma interrupt seen in /proc/interrupts.
 
 All data generated from interrupts are accessed via chardevs.
+lsinput and input-event are part of package input-utils.
 ```bash
 lsinput
 /dev/input/event0
