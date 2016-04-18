@@ -1637,9 +1637,12 @@ A simple XOR checksum of all bytes in message including message length.<br>
 #define STATUS_OK 0
 #define STATUS_RECV_ERROR 1
 #define STATUS_RECV_NO_DATA 2
+#define STATUS_MASTER_REQUEST 3
 ```
 	STATUS_RECV_ERROR indicates that data have been read on the bus, but no valid LIN frame were found. Just all the data is returned for debuging purposes.
 	STATUS_RECV_NO_DATA activity on the bus but no data found.
+    STATUS_MASTER_REQUEST message with only one byte data found, this is a
+    master request.
 
 	data:
 	The LIN frame. 
