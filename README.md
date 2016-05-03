@@ -1524,6 +1524,7 @@ Linux.<br>
 5. [Set baudrate](#set-baudrate). Setup LIN baudrate.<br>
 6. [Set master](#set-master). Setup master/listen mode.<br>
 7. [Listen message](#listen-message)
+8-11. [Overflow messages](#overflow-messages)
 <br>
 Defined in lin_general.h as:<br>
 ```c
@@ -1649,6 +1650,19 @@ A simple XOR checksum of all bytes in message including message length.<br>
 	id | data | LIN checksum
 	id: With parity omit bit 7 and 6 for id without parity
 	LIN checksum: If it is a valid frame the checksum is here
+#### Overflow message
+	When a overflow occurs at any of the busses handling LIN a report of which
+    bus and how many overflows that have occured is sent to the Linux system.
+    Format:
+    message start | length of message | message type (8-11) | count
+    Each typ of overflow has its own message type:
+```C
+#define MSG_LIN_RX_OF 8
+#define MSG_LIN_TX_OF 9
+#define MSG_TX_OF 10
+#define MSG_RX_OF 11
+```
+
 ### Status message
 	All commands sent to PIC, except listen which is no command, will return a status message. 
 	Format:
