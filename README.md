@@ -70,6 +70,7 @@
 		- [ERROR-STATE](#error-state)
 		- [FIRMWARE-UPGRADE](#firmware-upgrade)
 - [Package Manager](#package-manager)
+- [Accelerometer](#accelerometer)
 
 ## Overview
 
@@ -1519,8 +1520,10 @@ Linux.<br>
 4. [Set item](#set-item). Setup a LIN schedule item.<br>
 5. [Set baudrate](#set-baudrate). Setup LIN baudrate.<br>
 6. [Set master](#set-master). Setup master/listen mode.<br>
+7. [Listen message](#listen-message)
+8-11. [Overflow messages](#overflow-messages)
 <br>
-Defined in lin.h as:<br>
+Defined in lin_general.h as:<br>
 ```c
 #define MSG_RECV_RESPONSE 1
 #define MSG_SET_SCHEDULE 2
@@ -1528,6 +1531,7 @@ Defined in lin.h as:<br>
 #define MSG_SET_ITEM 4
 #define MSG_SET_BAUDRATE 5
 #define MSG_SET_MASTER 6
+#define MSG_LISTEN_MSG 7
 ```
 <br>
 data (variable):<br>
@@ -1620,6 +1624,57 @@ A simple XOR checksum of all bytes in message including message length.<br>
 
     master - 1
     listen - 0
+#### Listen message
+	When the LIN bus is in listen mode messages will be sent to Linux user space when data are found on the bus.
+	Format:
+	message start | length of message | message type 7 | status| data | checksum
+
+	status: 
+	Defined statuses:
+```C
+#define STATUS_OK 0
+#define STATUS_RECV_ERROR 1
+#define STATUS_RECV_NO_DATA 2
+#define STATUS_MASTER_REQUEST 3
+```
+	STATUS_RECV_ERROR indicates that data have been read on the bus, but no valid LIN frame were found. Just all the data is returned for debuging purposes.
+	STATUS_RECV_NO_DATA activity on the bus but no data found.
+    STATUS_MASTER_REQUEST message with only one byte data found, this is a
+    master request.
+
+	data:
+	The LIN frame. 
+	id | data | LIN checksum
+	id: With parity omit bit 7 and 6 for id without parity
+	LIN checksum: If it is a valid frame the checksum is here
+#### Overflow message
+	When a overflow occurs at any of the busses handling LIN a report of which
+    bus and how many overflows that have occured is sent to the Linux system.
+    Format:
+    message start | length of message | message type (8-11) | count
+    Each typ of overflow has its own message type:
+```C
+#define MSG_LIN_RX_OF 8
+#define MSG_LIN_TX_OF 9
+#define MSG_TX_OF 10
+#define MSG_RX_OF 11
+```
+
+### Status message
+	All commands sent to PIC, except listen which is no command, will return a status message. 
+	Format:
+	message start | status
+	status: One byte status, 0 status ok
+```C
+#define ERROR_ARGUMENT_COUNT 1
+#define ERROR_START_NOT_VALID 2
+#define ERROR_STOP_NOT_VALID 3
+#define ERROR_START_AFTER_STOP 4
+#define ERROR_SLOT_NOT_VALID 5
+#define ERROR_NOT_VALID_ENTRY 6
+#define ERROR_INVALID_LIN_ID 7
+#define ERROR_TO_LONG_FRAME 8
+	```
 ### Sample application for sending frames and receiving responses on Linux
 ```C
 #include <string.h>
@@ -1883,6 +1938,11 @@ int main (int argc, char *argv[])
 }
 
 ```
+#### Multiplexed digital IO
+Devices with IO pins with multiple functions, digital IO and LIN, must disable LIN before 
+using the digital IO functionality. This is controled via the virtual gpios
+LINx enabled. When the LIN channel is disabled the 
+
 ### Analog
 
 The ADC conversions are managed by the co-processor and the values are exposed as sysfiles.
@@ -2406,3 +2466,73 @@ To install something run for instance<br>
 opkg install rsync
 ```
 
+## Accelerometer
+The MX-4 is equipped with a Freescale MMA8452 accelerometer. 
+Datasheet: (http://www.freescale.com/files/sensors/doc/data_sheet/MMA8452Q.pdf)
+
+#### Usage on VF61-based systems
+Path in sysfs: /sys/bus/iio/devices/iio:device0<br>
+Read x,y,z: in_accel_{x,y,z}_raw<br>
+
+At the moment this driver only supports reading of coordinates via sysfs.
+
+#### Usage on T20-based systems
+Path in sysfs: /sys/class/sensor/mma/ <br>
+Read x,y,z: value_{x,y,z} <br>
+
+Interrupts from the accelerometer are routed to two GPIOs on the Colibri
+module. The GPIOs are not exported.
+Data ready is routed to INT1, other interrupts are routed to INT2.
+INT1 is the first mma interrupt seen in /proc/interrupts.
+
+All data generated from interrupts are accessed via chardevs.
+lsinput and input-event are part of package input-utils.
+```bash
+lsinput
+/dev/input/event0
+   bustype : (null)
+   vendor  : 0x0
+   product : 0x0
+   version : 0
+   name    : "mma845x"
+   bits ev : EV_SYN EV_ABS
+
+/dev/input/event1
+   bustype : (null)
+   vendor  : 0x0
+   product : 0x0
+   version : 0
+   name    : "Accl1"
+   bits ev : EV_SYN EV_KEY EV_ABS EV_MSC
+```
+mma845x is for coordinate data. Accl1 is for configured interrupts.
+
+
+Most of the possibilities mentioned in the mma8452 datasheet are available for
+configuration via the driver sysfs interface.  
+
+Example for testing transient interrupts.
+```bash
+cd /sys/class/sensor/mma/transitent_detection0
+echo enable,enable,enable > enable
+echo 1 > threshold # set lowest possible threshold for transient
+input-events 1
+# Move the device to generate a movement transient
+# Output:
+dev/input/event1
+   bustype : (null)
+   vendor  : 0x0
+   product : 0x0
+   version : 0
+   name    : "Accl1"
+   bits ev : EV_SYN EV_KEY EV_ABS EV_MSC
+
+waiting for events
+00:18:33.808626: EV_KEY KEY_LEFTSHIFT pressed
+00:18:33.808629: EV_KEY KEY_G pressed
+00:18:33.808633: EV_KEY KEY_G released
+00:18:33.808635: EV_KEY KEY_LEFTSHIFT released
+00:18:33.808639: EV_ABS ??? 96
+00:18:33.808643: EV_ABS ??? 0
+00:18:33.808644: EV_SYN code=0 value=0
+```
