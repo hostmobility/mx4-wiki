@@ -163,10 +163,18 @@ It is also possible to setup a customer specific build job on request where one 
 
 ## Build Environment
 
+Before buildning, be aware of:
+<ul>
+<li>to have approximately 30 GB amount of free space on your harddrive</li>
+<li>that a SSD will make the build process go quicker </li>
+<li>we recommend to have 4 GB of RAM</li>
+<li>to have at least 2 cores, but we recommend 4 cores or more</li>
+</ul>
+
 ### Setup Docker
 	
-Install Docker: [Docker Install]
-Create Dockerfile: touch Dockerfile
+Install Docker: [Docker Install] <br />
+Create Dockerfile: touch Dockerfile <br />
 Copy this template into the Dockerfile and edit it:
 <pre>	
 FROM debian
@@ -227,7 +235,7 @@ sudo docker run -it -u <b>1000</b> --privileged -v ~/.ssh:/home/<b>username</b>/
 ### Example to setup environment for MX-4 CT, branch BSP-v1.5.x
 
 #### Git clone from repository
-	# If SSH key is associated correctly with your account on github, run follow commands:
+	# If SSH key is associated correctly with your account on github, run the following commands:
 	git clone git@github.com:hostmobility/mx4 -b mx4-bsp-v1.5.x
 	git clone git@github.com:hostmobility/mx4-pic -b mx4-bsp-v1.5.x mx4/pic
 	# If not correctly associated, run follow commands:
