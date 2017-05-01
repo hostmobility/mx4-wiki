@@ -179,7 +179,7 @@ Copy this template into the Dockerfile and edit it:
 <pre>	
 FROM debian
 # Edit Your Name and ”your@mail.com”
-MAINTAINER Your Name "<b>your@mail.com</b>"
+MAINTAINER <b>Your Name</b> "<b>your@mail.com</b>"
 # Edit your username
 ARG user=<b>your username</b>
 # Edit your group, mostly the same as username
