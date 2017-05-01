@@ -166,7 +166,7 @@ It is also possible to setup a customer specific build job on request where one 
 Before buildning, be aware of:
 <ul>
 <li>to have approximately 30 GB amount of free space on your harddrive</li>
-<li>that a SSD will make the build process go quicker </li>
+<li>that a SSD will make the build process go faster </li>
 <li>we recommend to have 4 GB of RAM</li>
 <li>to have at least 2 cores, but we recommend 4 cores or more</li>
 </ul>
