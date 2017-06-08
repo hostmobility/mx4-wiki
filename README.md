@@ -220,6 +220,13 @@ RUN git config --global user.email "<b>your@mail.com</b>"
 RUN git config --global user.name "<b>Your Name</b>"
 RUN git config --global push.default simple
 </pre>
+
+#### Build Docker image
+Build the docker image using the Dockerfile and name it hostmobility/mx4
+<pre>
+docker build -t hostmobility/mx4 .
+</pre>
+
 #### Run Docker image
 <pre>
 # Edit user id 1000 with your user id. 
