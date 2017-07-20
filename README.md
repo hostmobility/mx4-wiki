@@ -257,6 +257,27 @@ cd mx4/t20
 # edit $(nproc) to number of cores you want to use while building.
 ./make_system.sh -t ct -r /home/<b>username</b>/<b>project</b>/rootfs/CT -d /home/<b>username</b>/<b>project</b>/yocto-1.5.x -g -k -u -j <b>$(nproc)</b> -m -T 512
 </pre>
+
+### Building other platforms
+
+The needed repositories and branch names can be seen here: https://github.com/hostmobility/mx4#source-structure
+
+### GTT v1.5.x
+<pre>
+git clone https://github.com/hostmobility/mx4/ -b mx4-bsp-v1.5.x
+git clone https://github.com/hostmobility/mx4-pic -b mx4-bsp-v1.5.x mx4/pic
+./make_system.sh -t gtt -r <b>UNIQUE_ROOTFS_PATH</b> -d <b>YOCTO_1.5.x_TEMP_PATH</b> -g -k -u -j <b>$(nproc)</b> -m -T 512
+</pre>
+
+### GTT-T30 v1.4.x
+<pre>
+git clone https://github.com/hostmobility/mx4/ -b mx4-bsp-v1.4.x-ultra
+git clone https://github.com/hostmobility/mx4-pic -b mx4-bsp-v1.4.x mx4/pic
+git clone https://github.com/hostmobility/linux-toradex.git -b mx4-bsp-v1.4.x-tegra mx4/t20/linux_vf
+git clone https://github.com/hostmobility/u-boot-toradex.git -b mx4-bsp-v1.4.x mx4/t20/u-boot_vf
+./make_system.sh -t t30 -r <b>UNIQUE_ROOTFS_PATH</b> -d <b>YOCTO_1.4.x_TEMP_PATH</b> -g -k -u -j <b>$(nproc)</b>
+</pre>
+
 ### Example to setup environment for MX-4 V61
 
 	# All products use mx4 and mx4-pic repository
@@ -1589,7 +1610,7 @@ $GPRMC,,V,,,,,,,,,,N*53
 $GPGSA,A,1,,,,,,,,,,,,,,,*1E
 ```
 
-## GPS for some other versions
+#### GPS for some other versions
 On some units the /dev/ttyACM2 and /dev/ttyACM1 is used instead.
 
 First activate the modem(if it is not already activated)
