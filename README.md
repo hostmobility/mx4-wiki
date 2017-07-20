@@ -1589,6 +1589,25 @@ $GPRMC,,V,,,,,,,,,,N*53
 $GPGSA,A,1,,,,,,,,,,,,,,,*1E
 ```
 
+## GPS for some other versions
+On some units the /dev/ttyACM2 and /dev/ttyACM1 is used instead.
+
+First activate the modem(if it is not already activated)
+<pre>echo 1 > /opt/hm/pic_attributes/ctrl_modem_on</pre>
+
+Wait a few seconds for the modem to turn on. You should see /dev/ttyACM2 and /dev/ttyACM1 if you do 
+<pre>ls /dev</pre>
+
+Connect to ACM2 using microcom(or other serial port program) so you can send commands
+<pre>microcom /dev/ttyACM2</pre>
+
+in microcom for ttyACM2 run these 2 commands to enable the Engine and enable GPS data output
+<pre>at^sgpsc="Engine","1"
+at^sgpsc="Nmea/Output","on"</pre>
+
+in microcom for ttyACM1 all GPS data output should now be displayed:
+<pre>microcom /dev/ttyACM1</pre>
+
 ### Watchdog
 
 The co-processor acts as a watchdog of the modem. It monitors the power indicator signal by default. If it should detect that the modem is for some reason turned off even though it should be on it will attempt to restart it at first via a soft reset signal and after a few attempts it will do a hard-reset of modem.
