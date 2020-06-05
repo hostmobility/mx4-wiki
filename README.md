@@ -1033,7 +1033,6 @@ One can read out the system reset cause from a spi attribute.
 ```bash
 root@ultra14211046:~# cat /opt/hm/pic_attributes/ctrl_pic_reset_cause
 or use /opt/hm/reset_cause.sh
-1
 ```
 
 ```c
@@ -1119,6 +1118,54 @@ and trace_default_interrupt"
 
 18
 "Reset Cause String: Deep Sleep Exit"
+
+## Wake up Cause
+```bash
+cat $MX4_SPI_DIR/ctrl_wakeup_cause
+or /opt/hm/wake_up_cause.sh
+```
+
+```c
+#define WAKE_UP_SRC_NONE            0x00
+#define WAKE_UP_SRC_WDT             0x01
+#define WAKE_UP_SRC_SPI_INT         0x02
+#define WAKE_UP_SRC_MAIN_VOLTAGE    0x03
+#define WAKE_UP_SRC_BATTERY_VOLTAGE 0x04
+#define WAKE_UP_SRC_ANALOG_1        0x05
+#define WAKE_UP_SRC_ANALOG_2        0x06
+#define WAKE_UP_SRC_ANALOG_3        0x07
+#define WAKE_UP_SRC_ANALOG_4        0x08
+#define WAKE_UP_SRC_START_SIGNAL    0x09
+#define WAKE_UP_SRC_CAN             0x0a
+#define WAKE_UP_SRC_DIN_1_F         0x0b
+#define WAKE_UP_SRC_DIN_1_R         0x0c
+#define WAKE_UP_SRC_DIN_2_F         0x0d
+#define WAKE_UP_SRC_DIN_2_R         0x0e
+#define WAKE_UP_SRC_DIN_3_F         0x0f
+#define WAKE_UP_SRC_DIN_3_R         0x10
+#define WAKE_UP_SRC_DIN_4_F         0x11
+#define WAKE_UP_SRC_DIN_4_R         0x12
+#define WAKE_UP_SRC_DIN_5_F         0x13
+#define WAKE_UP_SRC_DIN_5_R         0x14
+#define WAKE_UP_SRC_DIN_6_F         0x15
+#define WAKE_UP_SRC_DIN_6_R         0x16
+#define WAKE_UP_SRC_MODEM_RING      0x17
+#define WAKE_UP_SRC_START_SWITCH_F  0x18
+#define WAKE_UP_SRC_START_SWITCH_R  0x19
+#define WAKE_UP_SRC_MIN_1_F         0x20
+#define WAKE_UP_SRC_MIN_1_R         0x21
+#define WAKE_UP_SRC_MIN_2_F         0x22
+#define WAKE_UP_SRC_MIN_2_R         0x23
+#define WAKE_UP_SRC_DIN_7_F         0x24
+#define WAKE_UP_SRC_DIN_7_R         0x25
+#define WAKE_UP_SRC_DIN_8_F         0x26
+#define WAKE_UP_SRC_DIN_8_R         0x27
+```
+
+- WDT = watchdog 
+- SPI INT = Spi communication from linux system
+- DIN_X = Digital In number n
+- ANALOG = Analog In number n 
 
 ## Timekeeping
 
