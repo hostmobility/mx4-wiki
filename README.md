@@ -1053,6 +1053,7 @@ or use /opt/hm/reset_cause.sh
 #define PRC_TRAP_OSC			REG_BIT(12)
 #define PRC_TRAP_ADDRESS		REG_BIT(13)
 #define PRC_TRAP_STACK			REG_BIT(14)
+#define PRC_PROTOCOL_WATCHDOG		REG_BIT(16)
 #define PRC_TRAP_MATH			REG_BIT(15)
 #define PRC_CLOCK_SWITCH_FAILED		REG_BIT(17)
 #define PRC_DEEP_SLEEP_EXIT		REG_BIT(18)
@@ -1071,7 +1072,7 @@ or use /opt/hm/reset_cause.sh
 "Reset Cause String: Sleep Reset"
 
 4
-"Reset Cause String: Watchdog Reset"
+"Reset Cause String: Watchdog Reset (Co-cpu rest internal watchdog flag trigged)
 
 5
 "Reset Cause String: Software Reset (set by user)"
@@ -1111,7 +1112,7 @@ and trace_default_interrupt"
 
 
 16
-"Reset Cause String: Protocol Watchdog Reset"
+"Reset Cause String: Protocol Watchdog Reset (linux spi protocol stoped sending and co-cpu reset)"
 
 17
 "Reset Cause String: Clock Switch Failed"
