@@ -2739,5 +2739,23 @@ waiting for events
 00:18:33.808639: EV_ABS ??? 96
 00:18:33.808643: EV_ABS ??? 0
 00:18:33.808644: EV_SYN code=0 value=0
+
+Test to set the auto_wakeup or change the sample rate
+echo disable > /sys/class/sensor/mma/auto_wakeup
+cat /sys/class/sensor/mma/auto_wakeup
+echo enable > /sys/class/sensor/mma/auto_wakeup
+cat /sys/class/sensor/mma/auto_wakeup
+
+supported sample rate in 3.1.10
+cat /sys/class/sensor/mma/supported_odr
+800.0;400.0;200.0;100.0;50.0;12.500;6.250;1.560
+
+test maximum and minimum
+echo 800.0 > /sys/class/sensor/mma/odr
+cat /sys/class/sensor/mma/odr
+
+echo 1.560 > /sys/class/sensor/mma/odr
+cat /sys/class/sensor/mma/odr
+
 ```
 [Docker install]:https://docs.docker.com/engine/installation/#supported-platforms
