@@ -19,7 +19,6 @@
 - [Default Login](#default-login)
 - [Reset Cause](#reset-cause)
 - [Timekeeping](#timekeeping)
-	- [Internal RTC](#internal-rtc)
 	- [GPS RTC](#gps-rtc)
 - [Sound](#sound)
 - [Power Management](#power-management)
@@ -1172,40 +1171,6 @@ or /opt/hm/wake_up_cause.sh
 There are two clocks that are battery backed up in MX-4.
 - Main CPU internal real time clock
 - GPS time in modem
-
-### Internal RTC
-The main CPU internal real time clock is `/dev/rtc0` and the time can be read
-out with the `hwclock` command.
-
-```bash
-# Show hardware date/time
-root@mx4-vcc-1000000:~# hwclock
-Mon Nov  3 13:25:07 2014  0.000000 seconds
-```
-
-```bash
-#Set hardware date/time to system date/time:
-root@mx4-vcc-1000000:~# hwclock -w
-```
-
-```bash
-#Set system date/time to hardware date/time:
-root@mx4-vcc-1000000:~# hwclock -s
-```
-
-The Linux system time is synchronized with the main CPU internal real time clock at boot time.
-Linux system time can be read out with the 'date' command.
-
-```bash
-root@mx4-vcc-1000000:~# date
-Mon Nov  3 13:25:25 UTC 2014
-```
-
-On our default images we try to synchronize time from `pool.ntp.org` on an ifup
-networking event. If we succeed with the `ntpdate` command we synchronize the
-system time to hardware clock (main CPU internal real time clock).
-
-See `/etc/network/if-up.d/ntpdate-sync` and `/etc/default/ntpdate` on target system.
 
 ### GPS RTC
 
