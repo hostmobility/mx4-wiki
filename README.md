@@ -1196,77 +1196,7 @@ The interal linux map to external connector:
     /dev/ttyHS3 ---> RS232/CTS/RTS (RS232-1)
     /dev/ttyS1  ---> RS232 TX/RX (RS232-2)
 
-### CAN
-
-All MX-4 boards are equipped with CAN controllers. We are using the socketCAN API to communicate with our hardware. See [socketCAN wiki](http://en.wikipedia.org/wiki/SocketCAN)
-
-#### Configuring CAN bus
-
-Setting CAN speed to 250 kbit/s and listen only mode. `iproute2` is a requirement for these commands to work.
-```bash
-ip link set can0 type can bitrate 250000 listen-only on
-ifconfig can0 up
-```
-
-#### CAN tools
-
-There is a set off tools developed to be used with the socketCAN API. Package name is can-utils. It should be installed on target but if it is not run the following command.
-
-```bash
-opkg update
-opkg install can-utils
-```
-
-Two great and easy to use tools which are bundled in the can-utils packare are `candump` and `cansend`.
-
-#### Cansend example
-Extended frame identifier 0x1234 with dlc of eight
-
-```bash
-cansend can0 -e -i 0x1234 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08
-```
-
-#### Statistics
-The linux kernel collects statistics on CAN networks, similar to TCP/IP. These can be read out in different ways.
-
-With `ifconfig` tool.
-
-```bash
-root@mx4-gtt:~# ifconfig can0
-      can0      Link encap:UNSPEC  HWaddr 00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00
-      UP RUNNING NOARP  MTU:16  Metric:1
-      RX packets:2 errors:0 dropped:0 overruns:0 frame:0
-      TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
-      collisions:0 txqueuelen:10
-      RX bytes:16 (16.0 B)  TX bytes:0 (0.0 B)
-      Interrupt:205
-```
-
-With `iproute2` tool.
-
-```bash
-root@mx4-gtt:~/test/can_test# ip -d -s link show can0
-2: can0: <NOARP,UP,LOWER_UP,ECHO> mtu 16 qdisc pfifo_fast state UNKNOWN mode DEFAULT qlen 10
-   link/can
-   can state ERROR-PASSIVE (berr-counter tx 128 rx 0) restart-ms 0
-   bitrate 25000 sample-point 0.875
-   tq 2500 prop-seg 6 phase-seg1 7 phase-seg2 2 sjw 1
-   sja1000: tseg1 1..16 tseg2 1..8 sjw 1..4 brp 1..64 brp-inc 1
-   clock 12000000
-   re-started bus-errors arbit-lost error-warn error-pass bus-off
-   0          0          0          1          1          0
-   RX: bytes  packets  errors  dropped overrun mcast
-   16         2        0       0       0       0
-   TX: bytes  packets  errors  dropped carrier collsns
-   0          0        0       0       0       0
-```
-
-
-
-
-
-
-
+CAN migrated to https://github.com/hostmobility/documentation 
 
 ## Modem
 
