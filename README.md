@@ -1261,96 +1261,11 @@ root@mx4-gtt:~/test/can_test# ip -d -s link show can0
    0          0        0       0       0       0
 ```
 
-### Wifi
 
-#### USAGE
 
-All that is required to start Wifi moudule is `ifup wlan0`.
 
-```
-#/etc/networking/interfaces
-auto wlan0
-iface wlan0 inet dhcp
-    wpa-driver nl80211
-    wpa-conf /etc/wpa_supplicant.conf
-```
 
-One has to edit `/etc/wpa_supplicant.conf` to add new networks which the module should connect to.
-```
-#/etc/wpa_supplicant.conf
-ctrl_interface=/var/run/wpa_supplicant
-ctrl_interface_group=0
-update_config=1
 
-network={
-        ssid="HostMobility-Guest"
-        psk="*************"
-        scan_ssid=1
-}
-
-```
-
-See more configuration examples at http://linux.die.net/man/5/wpa_supplicant.conf
-
-#### Wifi as Access Point
-
-##### Linux kernel
-Edit kernel to include following drivers. Recompile and deploy to target.
-
-`CONFIG_ATH_COMMON=y`<br>
-`CONFIG_ATH9K_HW=y`<br>
-`CONFIG_ATH9K_HTC=y`<br>
-
-##### Target setup
-[Download firmware](http://wireless.kernel.org/download/htc_fw/1.3/htc_9271.fw) and place it in /lib/firmware
-
-Run `opkg install hostap-daemon`.
-
-Run `hostapd /etc/hostapd.conf` to start the wifi access point daemon.
-
-Run `udhcpd  -S /etc/wifi-ap-dhcp.conf` to start dhcp server.
-
-Script to route internet connection (OBS! You need to enable forwarding in kernel):
-
-```bash
-#!/bin/sh
-IPT=/sbin/iptables
-LOCAL_IFACE=wlan1
-INET_IFACE=eth0
-INET_ADDRESS=192.168.0.59
-# Flush the tables
-$IPT -F
-$IPT -t nat -F
-
-$IPT -I INPUT -i $LOCAL_IFACE -j ACCEPT
-# This tells iptables to accept all traffic coming from all devices accept ppp0 (internet).
-# This rule is added as the first rule in the INPUT chain.
-# Notice that this rule doesn't actually deny traffic from ppp0.
-$IPT -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-# This is the line for the stateful firewall.
-# It means that it will only accept connections from nodes that you already connected to.
-$IPT -A INPUT -p tcp -i $INET_IFACE -j REJECT --reject-with tcp-reset
-$IPT -A INPUT -p udp -i $INET_IFACE -j REJECT --reject-with icmp-port
-# Those 2 lines aren't actually necessary. We reject unwanted connection-attempts here instead
-#of dropping them by the default INPUT policy. This so others won't know you have a firewall.
-
-#Now we add the rules for NAT:
-$IPT -I FORWARD -i $LOCAL_IFACE -d 192.168.1.0/255.255.255.0 -j DROP
-$IPT -A FORWARD -i $LOCAL_IFACE -s 192.168.1.0/255.255.255.0 -j ACCEPT
-$IPT -A FORWARD -i $INET_IFACE -d 192.168.1.0/255.255.255.0 -j ACCEPT
-$IPT -t nat -A POSTROUTING -o $INET_IFACE -j MASQUERADE
-#We set the policies for the chains:
-$IPT -P INPUT DROP
-# We want to drop any packets that don't match our rules don't we?
-$IPT -P FORWARD DROP
-# Same here..
-$IPT -P OUTPUT ACCEPT
-# We usually allow everything out and only block specific things we don't want.
-```
-
-[Example hostapd config file](http://hostmobility.org/file_host/wifi/hostapd.conf)
-
-[Example udhcpd config file](http://hostmobility.org/file_host/wifi/wifi-ap-dhcp.conf)
 
 
 ## Modem
