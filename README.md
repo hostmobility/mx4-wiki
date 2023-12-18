@@ -37,11 +37,7 @@
 		- [CAN tools](#can-tools)
 		- [cansend example](#cansend-example)
 		- [Statistics](#statistics)
-	- [Wifi](#wifi)
-		- [Usage](#usage)
-		- [Wifi as Access Point](#wifi-as-access-point)
-			- [Linux Kernel](#linux-kernel)
-			- [Target Setup](#target-setup)
+
 	- [J1708](#j1708)
 	- [LIN](#lin)
 - [Analog](#analog)
