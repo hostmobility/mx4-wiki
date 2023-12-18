@@ -18,8 +18,6 @@
 - [Bootlog](#bootlog)
 - [Default Login](#default-login)
 - [Reset Cause](#reset-cause)
-- [Timekeeping](#timekeeping)
-	- [GPS RTC](#gps-rtc)
 - [Sound](#sound)
 - [Power Management](#power-management)
 	- [Running](#running)
@@ -1157,23 +1155,6 @@ or /opt/hm/wake_up_cause.sh
 - DIN_X = Digital In number n
 - ANALOG = Analog In number n 
 
-## Timekeeping
-
-There are two clocks that are battery backed up in MX-4.
-- Main CPU internal real time clock
-- GPS time in modem
-
-### GPS RTC
-
-The GPS time can be parsed from the $GPRMC string which is outputted by the GPS.
-
-This time is backed up because we want faster GPS fix times, otherwise it would have
-to restart from fresh each time GPS engine is restarted.
-
-This backed up time could also work as a fall back to an application if system time
-for some reason never can be synchronized from the Internet.
-
-We do not do anything with this in our default platform.
 
 ## Communication Interfaces
 
