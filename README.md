@@ -32,11 +32,7 @@
 	- [Shutdown/Cutoff](#shutdown)
 - [Communication Interfaces](#communication-interfaces)
 	- [Serial Devices](#serial-devices)
-	- [CAN](#can)
-		- [Configure CAN](#configuring-can-bus)
-		- [CAN tools](#can-tools)
-		- [cansend example](#cansend-example)
-		- [Statistics](#statistics)
+
 
 	- [J1708](#j1708)
 	- [LIN](#lin)
