@@ -30,8 +30,6 @@
 	- [Deep Sleep](#deep-sleep)
 	- [Shutdown/Cutoff](#shutdown)
 - [Communication Interfaces](#communication-interfaces)
-
-	- [J1708](#j1708)
 	- [LIN](#lin)
 - [Analog](#analog)
 - [LED](#led)
@@ -449,13 +447,8 @@ or /opt/hm/wake_up_cause.sh
 ## Communication Interfaces
 
 
-CAN migrated to https://github.com/hostmobility/documentation 
+Migrated to https://github.com/hostmobility/documentation 
 
-
-
-## J1708
-
-Work in progress...
 
 ## LIN
 
