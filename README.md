@@ -18,7 +18,6 @@
 - [Bootlog](#bootlog)
 - [Default Login](#default-login)
 - [Reset Cause](#reset-cause)
-- [Sound](#sound)
 - [Power Management](#power-management)
 	- [Running](#running)
 	- [Sleep](#sleep)
@@ -942,63 +941,6 @@ During the above steps GSM LED will flash when we are sending data to the co-pro
 
 1. Done!
 
-## Sound
-
-To direct line-in to line-out:
-
-```bash
-amixer -c 2 set 'Left HP Mixer Line Bypass' on
-amixer -c 2 set 'Right HP Mixer Line Bypass' on
-```
-
-Playback-hdmi:
-
-```bash
-aplay -D 'default:CARD=tegra' bach.au
-```
-
-Playback:
-
-```bash
-amixer -c 2 set 'Headphone' 8 on
-amixer -c 2 set 'Left HP Mixer PCM' on
-amixer -c 2 set 'Right HP Mixer PCM' on
-aplay -D 'default:CARD=T20' output2.wav
-```
-
-Record from line-in:
-
-```bash
-amixer -c 2 set 'Left Capture Select' 'Line'
-amixer -c 2 set 'Right Capture Select' 'Line'
-amixer -c 2 set 'Capture ADC' on
-arecord -D 'default:CARD=T20' -v -f cd output2.wav
-```
-
-Record from mic:
-
-```bash
-amixer -c 2 set 'Left Capture Select' 'Mic'
-amixer -c 2 set 'Right Capture Select' 'Mic'
-amixer -c 2 set 'Capture ADC' on
-amixer -c 2 set 'Left HP Mixer Mic Sidetone' on
-amixer -c 2 set 'Right HP Mixer Mic Sidetone' on
-arecord -D 'default:CARD=T20' -v -f cd output2.wav
-```
-
-Please note that the two numbers at the end specify which ALSA card and device to use for audio (e.g. alsasink device=hw:1,0 for SPDIF through HDMI and alsasink device=hw:2,0 for WM9715L AC97 through headphone).
-
-```bash
-aplay -L
-null
-    Discard all samples (playback) or generate zero samples (capture)
-default:CARD=tegra // HDMI
-    tegra,
-    Default Audio Device
-default:CARD=T20 // AC97
-    Toradex Colibri T20,
-    Default Audio Device
-```
 
 ## Power Management
 
