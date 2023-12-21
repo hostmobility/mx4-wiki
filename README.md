@@ -2,53 +2,12 @@
 
 ***
 
-##Table of Contents##
-
-- [Overview](#overview)
-	- [Soft deliverables](#soft-deliverables)
-		- [Platform](#platform)
-			- [Toolchain](#toolchain)
-			- [Release structure](#release-structure)
-			- [Firmware update](#firmware-update)
-		- [Source code](#source-code)
-		- [Support](#support)
-			- [Wiki](#wiki)
-		- [Build server](#build-server)
-- [Build Environment](#build-environment)
-- [Bootlog](#bootlog)
-- [Default Login](#default-login)
-- [Communication Interfaces](#communication-interfaces)
-- [Package Manager](#package-manager)
-
-## Overview
-
-Work in progress...
-
-### Soft deliverables
-
-When you buy a MX-4 hardware from Host Mobility AB the following is included.
-
-#### Platform
-
-Host Mobility AB provides a complete Linux platform with driver support for all hardware interfaces and with a customizable distribution.
-
-All hardware interfaces are accessible via well defined API's. We try to reuse the standard Linux way of doing things as much as we can. This way the platform environment is familiar to developers who has worked with embedded Linux in their past.
-
-Main software components:
-
-- Tool-chain
-	- Tegra2: Linaro GCC 4.7-2013.09 (http://releases.linaro.org/13.09/components/toolchain/gcc-linaro/4.7)
-- Linux (Tegra2: 3.1.10)
-- U-boot (Tegra2: 2011.06)
-- Ångstrom distribution built with yocto (dylan branch)(https://www.yoctoproject.org/)
-- Co-processor firmware
-
 ##### Toolchain
 
-Toolchain binaries are generated with yocto command `-c populate_sdk`. Toolchains are built for both 32 and 64 bit systems.
 
 There are two flavors of sysroots. The minimal is based on `console-vcc-base-image` and the other one is based on `lxde-mx4-image`.
 
+  - hardware/host-monitor-x.md
 They are available on following link http://www.hostmobility.org:8080/tools/.
 
 There is a problem with installation where you get segmentation faults when trying to run a binary. See this link http://developer.toradex.com/how-to/how-to-set-up-qt-creator-to-cross-compile-for-embedded-linux#Install_the_SDK for a workaround.
@@ -63,29 +22,6 @@ First the mx4-bsp-vx.x.x tag is created in mx4 and in all sub repositories. The 
 
 The above structure is needed since we have alot of products in the same tree and we most likely will break something when adding new products to the tree. This way we have always our stable branches while developing new functionality.
 
-##### Firmware Update
-
-Host Mobility AB provides a simple method to update the firmware in the MX-4 hardware.
-
-This method is based on a u-boot script (named "hmupdate.img") which is able to update all software components (Linux kernel, u-boot, distribution, co-processor firmware).
-
-This is easily done by placing "hmupdate.img" in the root of a USB flash drive and simply restarting the MX-4 system with the USB flash drive plugged in.
-
-The image ("hmupdate.img") can also be placed in the internal nand flash in /boot directory which will trigger an update as well. This method could be integrated in a customer application for over the air updates.
-
-**After BSP release 1.1.x the user needs to trigger a probe for an update image (hmupdate.img), this was done on every startup on earlier releases.**
-
-**To update from USB you need to plug in the USB containing an image ("hmupdate.img") and press the reset button.**
-
-**To trigger an update from /boot one needs to set the `firmware_update` u-boot environment variable to `true`. See below example on how to do that.**
-
-**Setting `firmware_update` to `true` will enable USB update as well if an image is present on the USB drive.**
-***
-
-```
-# Set u-boot environment variable
-root@mx4_vf-1000000:/opt/hm/fw_env# ./fw_setenv firmware_update true
-```
 
 #### Source code
 
@@ -100,15 +36,6 @@ Host Mobility AB provides first class support.
 We will help you get started with MX-4 development and once the initial steps are done we also provide tips and tricks to optimize your application to our platform.
 
 Beside the documentation and wiki you can also contact Host Mobility developers directly with your questions. See http://hostmobility.com for contact information.
-
-##### Wiki
-http://hostmobility.github.io/mx4/
-
-#### Build Server
-
-Host Mobility AB provides access to our build server which is based on Jenkins software. Here you can download the latest and greatest software for your MX-4 platform.
-
-It is also possible to setup a customer specific build job on request where one could integrate the customer application in the MX-4 platform build system or build a branch of the MX-4 platform repository.
 
 ## Build Environment
 
@@ -256,56 +183,8 @@ git-core diffstat unzip texinfo build-essential chrpath autoconf flex bison \
 device-tree-compiler mtd-utils lzop
 ```
 
-
-## Default Login
-
-		.---O---.
-		|       |                  .-.           o o
-		|   |   |-----.-----.-----.| |   .----..-----.-----.
-		|       |     | __  |  ---'| '--.|  .-'|     |     |
-		|   |   |  |  |     |---  ||  --'|  |  |  '  | | | |
-		'---'---'--'--'--.  |-----''----''--'  '-----'-'-'-'
-		                -'  |
-		                '---'
-
-		The Angstrom Distribution mx4-gtt-1000000 ttyS0
-
-		Angstrom v2013.06 - Kernel
-
-		mx4-gtt-1000000 login:
-
-Default username: `root` password: `none`
-
-
-
-
-
 ## Communication Interfaces
 
 
 Migrated to https://github.com/hostmobility/documentation 
 
-## Package Manager
-
-There is a opkg feed for the MX4<br>
-<br>
-Create or edit the file /etc/opkg/hm-feed.conf, by adding the following lines<br>
-<br>
-src/gz all http://www.hostmobility.org:8008/ipk/all<br>
-src/gz armv7ahf-vfp http://www.hostmobility.org:8008/ipk/armv7ahf-vfp<br>
-src/gz colibri_t20 http://www.hostmobility.org:8008/ipk/colibri_t20<br>
-<br>
-After that simply run
-
-```bash
-opkg update
-opkg list
-```
-
-To install something run for instance<br>
-```bash
-opkg install rsync
-```
-
-
-[Docker install]:https://docs.docker.com/engine/installation/#supported-platforms
