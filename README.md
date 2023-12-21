@@ -2,17 +2,6 @@
 
 ***
 
-##### Toolchain
-
-
-There are two flavors of sysroots. The minimal is based on `console-vcc-base-image` and the other one is based on `lxde-mx4-image`.
-
-  - hardware/host-monitor-x.md
-They are available on following link http://www.hostmobility.org:8080/tools/.
-
-There is a problem with installation where you get segmentation faults when trying to run a binary. See this link http://developer.toradex.com/how-to/how-to-set-up-qt-creator-to-cross-compile-for-embedded-linux#Install_the_SDK for a workaround.
-
-Linaro 2013.04 is also compatible with the above toolchains. https://launchpad.net/linaro-toolchain-binaries/trunk/2013.04/+download/gcc-linaro-arm-linux-gnueabihf-4.7-2013.04-20130415_linux.tar.xz.
 
 ##### Release structure
 
